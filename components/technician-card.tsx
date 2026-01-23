@@ -21,11 +21,20 @@ export function TechnicianCard({ technician }: TechnicianCardProps) {
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
 
+          {/* Badges */}
+          <div className="absolute top-4 left-4 flex flex-col gap-2">
+            <div
+              className={`px-3 py-1 rounded-full text-xs font-medium w-fit ${technician.type === "digital" ? "bg-purple-500 text-white" : "bg-blue-500 text-white"
+                }`}
+            >
+              {technician.type === "digital" ? "Digital Service" : "Onsite Service"}
+            </div>
+          </div>
+
           {/* Availability Badge */}
           <div
-            className={`absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-medium ${
-              technician.available ? "bg-green-500 text-white" : "bg-gray-500 text-white"
-            }`}
+            className={`absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-medium ${technician.available ? "bg-green-500 text-white" : "bg-gray-500 text-white"
+              }`}
           >
             {technician.available ? "Available" : "Busy"}
           </div>
@@ -49,16 +58,25 @@ export function TechnicianCard({ technician }: TechnicianCardProps) {
             </div>
             <div className="text-right">
               <div className="text-lg font-bold text-foreground">Rs. {technician.rate.toLocaleString()}</div>
-              <div className="text-xs text-muted-foreground">per visit</div>
+              <div className="text-xs text-muted-foreground">{technician.type === "digital" ? "per hour/project" : "per visit"}</div>
             </div>
           </div>
 
-          {/* Areas */}
+          {/* Areas / Remote Badge */}
           <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
-            <MapPin className="w-4 h-4 text-primary" />
-            <span className="truncate">{technician.areas.slice(0, 2).join(", ")}</span>
-            {technician.areas.length > 2 && (
-              <span className="text-xs bg-muted px-2 py-0.5 rounded-full">+{technician.areas.length - 2}</span>
+            {technician.type === "digital" ? (
+              <>
+                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                <span className="font-medium text-green-600">Remote Service</span>
+              </>
+            ) : (
+              <>
+                <MapPin className="w-4 h-4 text-primary" />
+                <span className="truncate">{technician.areas.slice(0, 2).join(", ")}</span>
+                {technician.areas.length > 2 && (
+                  <span className="text-xs bg-muted px-2 py-0.5 rounded-full">+{technician.areas.length - 2}</span>
+                )}
+              </>
             )}
           </div>
 

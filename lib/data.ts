@@ -14,6 +14,8 @@ export interface Technician {
   phone: string
   whatsapp: string
   image: string
+  type: "onsite" | "digital"
+  service?: string // For digital services: web-development, graphic-design, content-writing
 }
 
 export interface Booking {
@@ -37,6 +39,25 @@ export interface AdminTechnician {
   joinedDate: string
   completedJobs: number
   image: string
+}
+
+export interface SubscriptionPlan {
+  id: string
+  name: string
+  price: number | string
+  priceLabel: string
+  credits: number | "unlimited"
+  features: string[]
+  recommended: boolean
+  color: string
+}
+
+export interface TechnicianSubscription {
+  technicianId: string
+  plan: "free" | "basic" | "standard" | "premium"
+  credits: number
+  activationDate: string
+  renewalDate?: string
 }
 
 export const karachiAreas = [
@@ -67,6 +88,77 @@ export const services = [
   "Appliance Repair",
 ]
 
+export const subscriptionPlans: SubscriptionPlan[] = [
+  {
+    id: "free",
+    name: "Free",
+    price: "Free",
+    priceLabel: "Free Forever",
+    credits: 3,
+    features: [
+      "Limited profile visibility",
+      "3 service leads per month",
+      "Limited customer requests",
+      "No priority placement",
+      "Basic support",
+    ],
+    recommended: false,
+    color: "bg-gray-50",
+  },
+  {
+    id: "basic",
+    name: "Basic",
+    price: 999,
+    priceLabel: "Rs 999/month",
+    credits: 20,
+    features: [
+      "Normal profile visibility",
+      "20 service leads per month",
+      "Respond to more customers",
+      "Standard support",
+      "Monthly billing",
+    ],
+    recommended: false,
+    color: "bg-blue-50",
+  },
+  {
+    id: "standard",
+    name: "Standard",
+    price: 2499,
+    priceLabel: "Rs 2,499/month",
+    credits: 50,
+    features: [
+      "Priority listing in search",
+      "50 service leads per month",
+      "Highlighted profile badge",
+      "Premium support",
+      "Featured in category",
+      "Monthly billing",
+    ],
+    recommended: true,
+    color: "bg-green-50",
+  },
+  {
+    id: "premium",
+    name: "Premium",
+    price: 4999,
+    priceLabel: "Rs 4,999/month",
+    credits: "unlimited",
+    features: [
+      "Top search placement",
+      "Unlimited service leads",
+      "Premium gold badge",
+      "24/7 dedicated support",
+      "Featured placement",
+      "Analytics dashboard",
+      "Priority customer matching",
+      "Monthly billing",
+    ],
+    recommended: false,
+    color: "bg-yellow-50",
+  },
+]
+
 export const technicians: Technician[] = [
   // ============ ELECTRICIANS ============
   {
@@ -85,6 +177,7 @@ export const technicians: Technician[] = [
     phone: "+92 300 1234567",
     whatsapp: "+92 300 1234567",
     image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face",
+    type: "onsite",
   },
   {
     id: "el-2",
@@ -102,6 +195,7 @@ export const technicians: Technician[] = [
     phone: "+92 301 2345678",
     whatsapp: "+92 301 2345678",
     image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face",
+    type: "onsite",
   },
   {
     id: "el-3",
@@ -119,6 +213,7 @@ export const technicians: Technician[] = [
     phone: "+92 302 3456789",
     whatsapp: "+92 302 3456789",
     image: "https://images.unsplash.com/photo-1519085360771-9852bada1c3f?w=400&h=400&fit=crop&crop=face",
+    type: "onsite",
   },
   {
     id: "el-4",
@@ -153,6 +248,7 @@ export const technicians: Technician[] = [
     phone: "+92 304 5678901",
     whatsapp: "+92 304 5678901",
     image: "https://images.unsplash.com/photo-1516321318423-f06f70504c94?w=400&h=400&fit=crop&crop=face",
+    type: "onsite",
   },
   {
     id: "el-6",
@@ -206,6 +302,7 @@ export const technicians: Technician[] = [
     phone: "+92 301 2345678",
     whatsapp: "+92 301 2345678",
     image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face",
+    type: "onsite",
   },
   {
     id: "pl-2",
@@ -223,6 +320,7 @@ export const technicians: Technician[] = [
     phone: "+92 305 6789012",
     whatsapp: "+92 305 6789012",
     image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=400&fit=crop&crop=face",
+    type: "onsite",
   },
   {
     id: "pl-3",
@@ -240,6 +338,7 @@ export const technicians: Technician[] = [
     phone: "+92 306 7890123",
     whatsapp: "+92 306 7890123",
     image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face",
+    type: "onsite",
   },
   {
     id: "pl-4",
@@ -257,6 +356,7 @@ export const technicians: Technician[] = [
     phone: "+92 307 8901234",
     whatsapp: "+92 307 8901234",
     image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face",
+    type: "onsite",
   },
   {
     id: "pl-5",
@@ -274,6 +374,7 @@ export const technicians: Technician[] = [
     phone: "+92 308 9012345",
     whatsapp: "+92 308 9012345",
     image: "https://images.unsplash.com/photo-1519085360771-9852bada1c3f?w=400&h=400&fit=crop&crop=face",
+    type: "onsite",
   },
   {
     id: "pl-6",
@@ -291,6 +392,7 @@ export const technicians: Technician[] = [
     phone: "+92 336 7890123",
     whatsapp: "+92 336 7890123",
     image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face",
+    type: "onsite",
   },
   {
     id: "pl-7",
@@ -308,6 +410,7 @@ export const technicians: Technician[] = [
     phone: "+92 337 8901234",
     whatsapp: "+92 337 8901234",
     image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face",
+    type: "onsite",
   },
 
   // ============ AC TECHNICIANS ============
@@ -327,6 +430,7 @@ export const technicians: Technician[] = [
     phone: "+92 302 3456789",
     whatsapp: "+92 302 3456789",
     image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&h=400&fit=crop&crop=face",
+    type: "onsite",
   },
   {
     id: "ac-2",
@@ -344,6 +448,7 @@ export const technicians: Technician[] = [
     phone: "+92 309 0123456",
     whatsapp: "+92 309 0123456",
     image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face",
+    type: "onsite",
   },
   {
     id: "ac-3",
@@ -361,6 +466,7 @@ export const technicians: Technician[] = [
     phone: "+92 310 1234567",
     whatsapp: "+92 310 1234567",
     image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face",
+    type: "onsite",
   },
   {
     id: "ac-4",
@@ -378,6 +484,7 @@ export const technicians: Technician[] = [
     phone: "+92 311 2345678",
     whatsapp: "+92 311 2345678",
     image: "https://images.unsplash.com/photo-1514888286974-6c03bf1e7785?w=400&h=400&fit=crop&crop=face",
+    type: "onsite",
   },
   {
     id: "ac-5",
@@ -395,6 +502,7 @@ export const technicians: Technician[] = [
     phone: "+92 312 3456789",
     whatsapp: "+92 312 3456789",
     image: "https://images.unsplash.com/photo-1539571696357-5a69c006ae5f?w=400&h=400&fit=crop&crop=face",
+    type: "onsite",
   },
   {
     id: "ac-6",
@@ -412,6 +520,7 @@ export const technicians: Technician[] = [
     phone: "+92 338 9012345",
     whatsapp: "+92 338 9012345",
     image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face",
+    type: "onsite",
   },
   {
     id: "ac-7",
@@ -429,6 +538,7 @@ export const technicians: Technician[] = [
     phone: "+92 339 0123456",
     whatsapp: "+92 339 0123456",
     image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face",
+    type: "onsite",
   },
 
   // ============ CARPENTERS ============
@@ -448,6 +558,7 @@ export const technicians: Technician[] = [
     phone: "+92 303 4567890",
     whatsapp: "+92 303 4567890",
     image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face",
+    type: "onsite",
   },
   {
     id: "ca-2",
@@ -465,6 +576,7 @@ export const technicians: Technician[] = [
     phone: "+92 313 4567890",
     whatsapp: "+92 313 4567890",
     image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face",
+    type: "onsite",
   },
   {
     id: "ca-3",
@@ -482,6 +594,7 @@ export const technicians: Technician[] = [
     phone: "+92 314 5678901",
     whatsapp: "+92 314 5678901",
     image: "https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=400&h=400&fit=crop&crop=face",
+    type: "onsite",
   },
   {
     id: "ca-4",
@@ -499,6 +612,7 @@ export const technicians: Technician[] = [
     phone: "+92 315 6789012",
     whatsapp: "+92 315 6789012",
     image: "https://images.unsplash.com/photo-1553224311-bedf415da822?w=400&h=400&fit=crop&crop=face",
+    type: "onsite",
   },
   {
     id: "ca-5",
@@ -516,6 +630,7 @@ export const technicians: Technician[] = [
     phone: "+92 316 7890123",
     whatsapp: "+92 316 7890123",
     image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face",
+    type: "onsite",
   },
   {
     id: "ca-6",
@@ -533,6 +648,7 @@ export const technicians: Technician[] = [
     phone: "+92 340 1234567",
     whatsapp: "+92 340 1234567",
     image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face",
+    type: "onsite",
   },
   {
     id: "ca-7",
@@ -550,6 +666,7 @@ export const technicians: Technician[] = [
     phone: "+92 341 2345678",
     whatsapp: "+92 341 2345678",
     image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face",
+    type: "onsite",
   },
 
   // ============ PAINTERS ============
@@ -569,6 +686,7 @@ export const technicians: Technician[] = [
     phone: "+92 304 5678901",
     whatsapp: "+92 304 5678901",
     image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face",
+    type: "onsite",
   },
   {
     id: "pa-6",
@@ -586,6 +704,7 @@ export const technicians: Technician[] = [
     phone: "+92 333 4567890",
     whatsapp: "+92 333 4567890",
     image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face",
+    type: "onsite",
   },
   {
     id: "pa-2",
@@ -603,6 +722,7 @@ export const technicians: Technician[] = [
     phone: "+92 317 8901234",
     whatsapp: "+92 317 8901234",
     image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face",
+    type: "onsite",
   },
   {
     id: "pa-3",
@@ -620,6 +740,7 @@ export const technicians: Technician[] = [
     phone: "+92 318 9012345",
     whatsapp: "+92 318 9012345",
     image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face",
+    type: "onsite",
   },
   {
     id: "pa-4",
@@ -637,6 +758,7 @@ export const technicians: Technician[] = [
     phone: "+92 319 0123456",
     whatsapp: "+92 319 0123456",
     image: "https://images.unsplash.com/photo-1540569014015-19a7662176e7?w=400&h=400&fit=crop&crop=face",
+    type: "onsite",
   },
   {
     id: "pa-5",
@@ -654,6 +776,7 @@ export const technicians: Technician[] = [
     phone: "+92 320 1234567",
     whatsapp: "+92 320 1234567",
     image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face",
+    type: "onsite",
   },
   {
     id: "pa-7",
@@ -671,6 +794,7 @@ export const technicians: Technician[] = [
     phone: "+92 342 3456789",
     whatsapp: "+92 342 3456789",
     image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face",
+    type: "onsite",
   },
 
   // ============ APPLIANCE REPAIR ============
@@ -690,6 +814,7 @@ export const technicians: Technician[] = [
     phone: "+92 305 6789012",
     whatsapp: "+92 305 6789012",
     image: "https://images.unsplash.com/photo-1514888286974-6c03bf1e7785?w=400&h=400&fit=crop&crop=face",
+    type: "onsite",
   },
   {
     id: "ap-2",
@@ -707,6 +832,7 @@ export const technicians: Technician[] = [
     phone: "+92 321 2345678",
     whatsapp: "+92 321 2345678",
     image: "https://images.unsplash.com/photo-1514888286974-6c03bf1e7785?w=400&h=400&fit=crop&crop=face",
+    type: "onsite",
   },
   {
     id: "ap-3",
@@ -724,6 +850,7 @@ export const technicians: Technician[] = [
     phone: "+92 322 3456789",
     whatsapp: "+92 322 3456789",
     image: "https://images.unsplash.com/photo-1546182990-dffeafbe841d?w=400&h=400&fit=crop&crop=face",
+    type: "onsite",
   },
   {
     id: "ap-4",
@@ -741,6 +868,7 @@ export const technicians: Technician[] = [
     phone: "+92 323 4567890",
     whatsapp: "+92 323 4567890",
     image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face",
+    type: "onsite",
   },
   {
     id: "ap-5",
@@ -758,6 +886,7 @@ export const technicians: Technician[] = [
     phone: "+92 324 5678901",
     whatsapp: "+92 324 5678901",
     image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face",
+    type: "onsite",
   },
   {
     id: "ap-6",
@@ -775,6 +904,7 @@ export const technicians: Technician[] = [
     phone: "+92 343 4567890",
     whatsapp: "+92 343 4567890",
     image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face",
+    type: "onsite",
   },
   {
     id: "ap-7",
@@ -792,6 +922,7 @@ export const technicians: Technician[] = [
     phone: "+92 344 5678901",
     whatsapp: "+92 344 5678901",
     image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face",
+    type: "onsite",
   },
 
   // ============ DIGITAL SERVICE PROVIDERS ============
@@ -811,6 +942,8 @@ export const technicians: Technician[] = [
     phone: "+92 325 6789012",
     whatsapp: "+92 325 6789012",
     image: "https://images.unsplash.com/photo-1514888286974-6c03bf1e7785?w=400&h=400&fit=crop&crop=face",
+    type: "digital",
+    service: "web-development",
   },
   {
     id: "d-2",
@@ -828,6 +961,8 @@ export const technicians: Technician[] = [
     phone: "+92 326 7890123",
     whatsapp: "+92 326 7890123",
     image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face",
+    type: "digital",
+    service: "graphic-design",
   },
   {
     id: "d-3",
@@ -845,6 +980,8 @@ export const technicians: Technician[] = [
     phone: "+92 327 8901234",
     whatsapp: "+92 327 8901234",
     image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face",
+    type: "digital",
+    service: "uiux-designer",
   },
   {
     id: "d-4",
@@ -862,6 +999,8 @@ export const technicians: Technician[] = [
     phone: "+92 328 9012345",
     whatsapp: "+92 328 9012345",
     image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face",
+    type: "digital",
+    service: "seo-specialist",
   },
   {
     id: "d-5",
@@ -879,6 +1018,8 @@ export const technicians: Technician[] = [
     phone: "+92 329 0123456",
     whatsapp: "+92 329 0123456",
     image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face",
+    type: "digital",
+    service: "content-writing",
   },
   {
     id: "d-6",
@@ -896,6 +1037,8 @@ export const technicians: Technician[] = [
     phone: "+92 330 1234567",
     whatsapp: "+92 330 1234567",
     image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face",
+    type: "digital",
+    service: "video-editor",
   },
   {
     id: "d-7",
@@ -913,6 +1056,8 @@ export const technicians: Technician[] = [
     phone: "+92 331 2345678",
     whatsapp: "+92 331 2345678",
     image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face",
+    type: "digital",
+    service: "digital-marketing",
   },
   {
     id: "d-8",
@@ -930,6 +1075,8 @@ export const technicians: Technician[] = [
     phone: "+92 332 3456789",
     whatsapp: "+92 332 3456789",
     image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face",
+    type: "digital",
+    service: "data-analyst",
   },
 ]
 

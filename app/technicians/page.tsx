@@ -11,10 +11,15 @@ import { Button } from "@/components/ui/button"
 
 function TechniciansContent() {
   const searchParams = useSearchParams()
+  
+  // Support both old and new parameter names
+  const skillParam = searchParams.get("skill") || ""
+  const typeParam = searchParams.get("type") || ""
+  
   const [selectedArea, setSelectedArea] = useState(searchParams.get("area") || "All Areas")
-  const [selectedService, setSelectedService] = useState(searchParams.get("service") || "All Services")
+  const [selectedService, setSelectedService] = useState(skillParam || searchParams.get("service") || "All Services")
   const [selectedServiceType, setSelectedServiceType] = useState<"onsite" | "digital" | "all">(
-    (searchParams.get("serviceType") as any) || "all"
+    (typeParam as any) || (searchParams.get("serviceType") as any) || "all"
   )
   const [areaOpen, setAreaOpen] = useState(false)
   const [serviceOpen, setServiceOpen] = useState(false)
@@ -28,16 +33,11 @@ function TechniciansContent() {
     const timer = setTimeout(() => {
       let filtered = technicians
 
-      // Digital services list
-      const digitalServices = ["Web Developer", "Graphic Designer", "UI/UX Designer", "SEO Specialist", "Content Writer", "Video Editor", "Digital Marketing", "Data Analyst"]
-
       // Filter by service type (onsite vs digital)
       if (selectedServiceType === "onsite") {
-        // Show only onsite technicians (not digital)
-        filtered = filtered.filter((tech) => tech.skill && !digitalServices.includes(tech.skill))
+        filtered = filtered.filter((tech) => tech.type === "onsite")
       } else if (selectedServiceType === "digital") {
-        // Show only digital service providers
-        filtered = filtered.filter((tech) => digitalServices.includes(tech.skill || ""))
+        filtered = filtered.filter((tech) => tech.type === "digital")
       }
 
       // Area filter only applies to onsite services
@@ -60,9 +60,10 @@ function TechniciansContent() {
   const clearFilters = () => {
     setSelectedArea("All Areas")
     setSelectedService("All Services")
+    setSelectedServiceType("all")
   }
 
-  const hasFilters = selectedArea !== "All Areas" || selectedService !== "All Services"
+  const hasFilters = selectedArea !== "All Areas" || selectedService !== "All Services" || selectedServiceType !== "all"
 
   return (
     <main className="min-h-screen bg-muted">
@@ -72,9 +73,44 @@ function TechniciansContent() {
       <div className="bg-secondary pt-24 pb-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2">
-            {selectedServiceType === "digital" ? "Find Digital Service Providers" : "Find Technicians"}
+            Find Services
           </h1>
-          <p className="text-gray-400">Browse verified professionals in Karachi</p>
+          <p className="text-gray-400">Browse verified professionals for digital and onsite needs</p>
+        </div>
+      </div>
+
+      {/* Service Type Tabs */}
+      <div className="bg-background border-b border-border">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex space-x-8 overflow-x-auto scrolbar-hide">
+            <button
+              onClick={() => setSelectedServiceType("all")}
+              className={`py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${selectedServiceType === "all"
+                ? "border-primary text-primary"
+                : "border-transparent text-muted-foreground hover:text-foreground"
+                }`}
+            >
+              All Services
+            </button>
+            <button
+              onClick={() => setSelectedServiceType("digital")}
+              className={`py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${selectedServiceType === "digital"
+                ? "border-primary text-primary"
+                : "border-transparent text-muted-foreground hover:text-foreground"
+                }`}
+            >
+              Digital Services
+            </button>
+            <button
+              onClick={() => setSelectedServiceType("onsite")}
+              className={`py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${selectedServiceType === "onsite"
+                ? "border-primary text-primary"
+                : "border-transparent text-muted-foreground hover:text-foreground"
+                }`}
+            >
+              Onsite Services
+            </button>
+          </div>
         </div>
       </div>
 
@@ -82,48 +118,56 @@ function TechniciansContent() {
       <div className="bg-background sticky top-16 z-30 border-b border-border shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex flex-wrap items-center gap-4">
-            {/* Area Filter - Only show for onsite services */}
+            {/* Area Filter - Only show for onsite services or when viewing all (optional, but requested logic says hide for digital) */}
             {selectedServiceType !== "digital" && (
-            <div className="relative">
-              <button
-                onClick={() => {
-                  setAreaOpen(!areaOpen)
-                  setServiceOpen(false)
-                }}
-                className="flex items-center gap-2 bg-muted hover:bg-muted/80 rounded-xl px-4 py-2.5 text-foreground transition-colors"
-              >
-                <MapPin className="w-4 h-4 text-primary" />
-                <span className="text-sm">{selectedArea}</span>
-                <ChevronDown className={`w-4 h-4 transition-transform ${areaOpen ? "rotate-180" : ""}`} />
-              </button>
-              {areaOpen && (
-                <div className="absolute top-full left-0 mt-2 bg-card rounded-xl shadow-xl border border-border max-h-60 overflow-y-auto z-20 min-w-48 animate-fade-in">
-                  {karachiAreas.map((area) => (
-                    <button
-                      key={area}
-                      onClick={() => {
-                        setSelectedArea(area)
-                        setAreaOpen(false)
-                      }}
-                      className={`w-full text-left px-4 py-2.5 hover:bg-muted transition-colors text-sm first:rounded-t-xl last:rounded-b-xl ${
-                        selectedArea === area ? "bg-primary/10 text-primary" : "text-foreground"
-                      }`}
-                    >
-                      {area}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
+              <div className="relative">
+                <button
+                  onClick={() => {
+                    setAreaOpen(!areaOpen)
+                    setServiceOpen(false)
+                  }}
+                  className="flex items-center gap-2 bg-muted hover:bg-muted/80 rounded-xl px-4 py-2.5 text-foreground transition-colors"
+                >
+                  <MapPin className="w-4 h-4 text-primary" />
+                  <span className="text-sm">{selectedArea}</span>
+                  <ChevronDown className={`w-4 h-4 transition-transform ${areaOpen ? "rotate-180" : ""}`} />
+                </button>
+                {areaOpen && (
+                  <div className="absolute top-full left-0 mt-2 bg-card rounded-xl shadow-xl border border-border max-h-60 overflow-y-auto z-20 min-w-48 animate-fade-in">
+                    {karachiAreas.map((area) => (
+                      <button
+                        key={area}
+                        onClick={() => {
+                          setSelectedArea(area)
+                          setAreaOpen(false)
+                        }}
+                        className={`w-full text-left px-4 py-2.5 hover:bg-muted transition-colors text-sm first:rounded-t-xl last:rounded-b-xl ${selectedArea === area ? "bg-primary/10 text-primary" : "text-foreground"
+                          }`}
+                      >
+                        {area}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             )}
 
             {/* Service Filter */}
             <div className="relative">
               {(() => {
                 // Get services based on selected service type
+                // Get services based on selected service type
                 const digitalServices = ["All Services", "Web Developer", "Graphic Designer", "UI/UX Designer", "SEO Specialist", "Content Writer", "Video Editor", "Digital Marketing", "Data Analyst"]
-                const displayServices = selectedServiceType === "digital" ? digitalServices : services
-                
+
+                let displayServices = services
+                if (selectedServiceType === "digital") {
+                  displayServices = digitalServices
+                } else if (selectedServiceType === "all") {
+                  const onsiteOnly = services.filter(s => s !== "All Services")
+                  const digitalOnly = digitalServices.filter(s => s !== "All Services")
+                  displayServices = ["All Services", ...onsiteOnly, ...digitalOnly]
+                }
+
                 return (
                   <>
                     <button
@@ -146,9 +190,8 @@ function TechniciansContent() {
                               setSelectedService(service)
                               setServiceOpen(false)
                             }}
-                            className={`w-full text-left px-4 py-2.5 hover:bg-muted transition-colors text-sm first:rounded-t-xl last:rounded-b-xl ${
-                              selectedService === service ? "bg-primary/10 text-primary" : "text-foreground"
-                            }`}
+                            className={`w-full text-left px-4 py-2.5 hover:bg-muted transition-colors text-sm first:rounded-t-xl last:rounded-b-xl ${selectedService === service ? "bg-primary/10 text-primary" : "text-foreground"
+                              }`}
                           >
                             {service}
                           </button>

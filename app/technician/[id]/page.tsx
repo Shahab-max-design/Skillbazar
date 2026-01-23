@@ -1,11 +1,12 @@
 "use client"
 
-import { useState, use } from "react"
+import { useState, use, useEffect } from "react"
 import Link from "next/link"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
 import { BookingModal } from "@/components/booking-modal"
 import { technicians } from "@/lib/data"
+import { useRecentProfessionals } from "@/hooks/use-recent-professionals"
 import {
   Star,
   MapPin,
@@ -23,8 +24,24 @@ import { Button } from "@/components/ui/button"
 export default function TechnicianProfilePage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params)
   const [isBookingOpen, setIsBookingOpen] = useState(false)
+  const { addProfessional } = useRecentProfessionals()
 
   const technician = technicians.find((t) => t.id === resolvedParams.id)
+
+  // Track when professional is viewed
+  useEffect(() => {
+    if (technician) {
+      addProfessional({
+        id: technician.id,
+        name: technician.name,
+        skill: technician.skill,
+        image: technician.image,
+        rating: technician.rating,
+        reviews: technician.reviews,
+        type: technician.type,
+      })
+    }
+  }, [technician, addProfessional])
 
   if (!technician) {
     return (

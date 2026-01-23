@@ -1,12 +1,49 @@
 "use client"
 
 import Link from "next/link"
-import { useState } from "react"
-import { Menu, X, Wrench } from "lucide-react"
+import { useState, useEffect } from "react"
+import { Menu, X, Wrench, LogOut, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { useRouter } from "next/navigation"
+import { redirectByRole } from "@/utils/roleRedirect"
+import { initializeDemoUser } from "@/hooks/use-user"
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const router = useRouter()
+
+  useEffect(() => {
+    // Initialize demo user on first page load
+    initializeDemoUser()
+
+    // Check if user is authenticated
+    const loggedIn = localStorage.getItem("skillbazaar_logged_in") === "true"
+    setIsAuthenticated(loggedIn)
+
+    // Also listen for storage changes (when login happens in another tab or same tab)
+    const handleStorageChange = () => {
+      const isNowLoggedIn = localStorage.getItem("skillbazaar_logged_in") === "true"
+      setIsAuthenticated(isNowLoggedIn)
+    }
+
+    window.addEventListener("storage", handleStorageChange)
+    return () => window.removeEventListener("storage", handleStorageChange)
+  }, [])
+
+  const handleProfileClick = () => {
+    console.log("Profile icon clicked - redirecting by role");
+    redirectByRole(router)
+  }
+
+  const handleLogout = () => {
+    console.log("Signing out - clearing all auth state");
+    localStorage.clear()
+    setIsAuthenticated(false)
+    setIsMenuOpen(false)
+    router.push("/auth/signin")
+  }
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
@@ -29,27 +66,36 @@ export function Navbar() {
             <Link href="/technicians?serviceType=digital" className="text-muted-foreground hover:text-foreground transition-colors">
               Find Digital Services
             </Link>
-            <Link href="/dashboard/customer" className="text-muted-foreground hover:text-foreground transition-colors">
-              Customer
-            </Link>
-            <Link
-              href="/dashboard/technician"
-              className="text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Technician
-            </Link>
-            <Link href="/dashboard/admin" className="text-muted-foreground hover:text-foreground transition-colors">
-              Admin
-            </Link>
           </div>
 
           <div className="hidden md:flex items-center gap-3">
-            <Link href="/auth/signin">
-              <Button variant="ghost">Sign In</Button>
-            </Link>
-            <Link href="/auth/signup">
-              <Button className="bg-primary hover:bg-primary/90">Get Started</Button>
-            </Link>
+            {isAuthenticated ? (
+              <>
+                <button
+                  onClick={handleProfileClick}
+                  className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:bg-primary/90 transition-colors"
+                  title="Go to Dashboard"
+                >
+                  <User className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={handleLogout}
+                  className="text-muted-foreground hover:text-foreground transition-colors"
+                  title="Sign Out"
+                >
+                  <LogOut className="w-5 h-5" />
+                </button>
+              </>
+            ) : (
+              <>
+                <Link href="/auth/signin">
+                  <Button variant="ghost">Sign In</Button>
+                </Link>
+                <Link href="/auth/signup">
+                  <Button className="bg-primary hover:bg-primary/90">Get Started</Button>
+                </Link>
+              </>
+            )}
           </div>
 
           <button className="md:hidden p-2" onClick={() => setIsOpen(!isOpen)} aria-label="Toggle menu">
@@ -70,25 +116,37 @@ export function Navbar() {
             <Link href="/technicians?serviceType=digital" className="block py-2 text-foreground" onClick={() => setIsOpen(false)}>
               Find Digital Services
             </Link>
-            <Link href="/dashboard/customer" className="block py-2 text-foreground" onClick={() => setIsOpen(false)}>
-              Customer Dashboard
-            </Link>
-            <Link href="/dashboard/technician" className="block py-2 text-foreground" onClick={() => setIsOpen(false)}>
-              Technician Dashboard
-            </Link>
-            <Link href="/dashboard/admin" className="block py-2 text-foreground" onClick={() => setIsOpen(false)}>
-              Admin Dashboard
-            </Link>
-            <div className="flex gap-3 pt-3">
-              <Link href="/auth/signin" className="flex-1">
-                <Button variant="ghost" className="w-full">
-                  Sign In
-                </Button>
-              </Link>
-              <Link href="/auth/signup" className="flex-1">
-                <Button className="w-full bg-primary">Get Started</Button>
-              </Link>
-            </div>
+            
+            {isAuthenticated ? (
+              <div className="space-y-3 pt-3 border-t border-border">
+                <button
+                  onClick={() => {
+                    handleProfileClick()
+                    setIsOpen(false)
+                  }}
+                  className="block w-full py-2 text-foreground text-left hover:text-primary transition-colors"
+                >
+                  Go to Dashboard
+                </button>
+                <button
+                  onClick={handleLogout}
+                  className="block w-full py-2 text-foreground text-left hover:text-red-500 transition-colors"
+                >
+                  Sign Out
+                </button>
+              </div>
+            ) : (
+              <div className="flex gap-3 pt-3">
+                <Link href="/auth/signin" className="flex-1">
+                  <Button variant="ghost" className="w-full">
+                    Sign In
+                  </Button>
+                </Link>
+                <Link href="/auth/signup" className="flex-1">
+                  <Button className="w-full bg-primary">Get Started</Button>
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       )}

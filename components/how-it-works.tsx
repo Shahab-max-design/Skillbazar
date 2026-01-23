@@ -7,17 +7,17 @@ const steps = [
   {
     icon: Search,
     title: "Search",
-    description: "Find technicians in your area by selecting service type and location",
+    description: "Find professionals by selecting service type (Digital or Onsite) and location",
   },
   {
     icon: UserCheck,
     title: "Choose",
-    description: "Browse profiles, check ratings, and pick the right professional for your needs",
+    description: "Browse profiles, portfolios, and ratings to pick the right expert",
   },
   {
     icon: Calendar,
-    title: "Book",
-    description: "Schedule a convenient time and confirm your booking instantly",
+    title: "Hire or Book",
+    description: "Book onsite visits or hire digital experts instantly",
   },
   {
     icon: ThumbsUp,
@@ -59,7 +59,7 @@ export function HowItWorks() {
         <div className="text-center mb-16">
           <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">How It Works</h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Getting help has never been easier. Follow these simple steps to connect with trusted technicians.
+            Getting help has never been easier. Follow these simple steps to connect with trusted service providers.
           </p>
         </div>
 
@@ -67,9 +67,8 @@ export function HowItWorks() {
           {steps.map((step, index) => (
             <div
               key={index}
-              className={`relative transition-all duration-500 ${
-                visibleSteps.includes(index) ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-              }`}
+              className={`relative transition-all duration-500 ${visibleSteps.includes(index) ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+                }`}
             >
               {/* Connector Line */}
               {index < steps.length - 1 && (

@@ -1,22 +1,57 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { DashboardSidebar } from "@/components/dashboard-sidebar"
 import { DashboardHeader } from "@/components/dashboard-header"
 import { StatCard } from "@/components/stat-card"
 import { EditProfileDialog } from "@/components/edit-profile-dialog"
-import { technicianBookingRequests, dashboardStats } from "@/lib/data"
-import { Wallet, TrendingUp, Briefcase, Clock, Star, Check, X, Coins } from "lucide-react"
+import { technicianBookingRequests, dashboardStats, subscriptionPlans } from "@/lib/data"
+import { getSubscriptionFromStorage, isOnsiteTechnician } from "@/lib/subscription"
+import { Wallet, TrendingUp, Briefcase, Clock, Star, Check, X, Coins, Zap, ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useUser } from "@/hooks/use-user"
 import { useToast } from "@/hooks/use-toast"
 
+// Role guard
+function useRoleGuard(router: ReturnType<typeof useRouter>) {
+  useEffect(() => {
+    if (typeof window === "undefined") return
+    const role = localStorage.getItem("userRole")
+    console.log("Technician Dashboard - USER ROLE:", role)
+    console.log("Technician Dashboard - CURRENT PATH:", window.location.pathname)
+    if (role !== "technician") {
+      console.log("❌ Access denied: Not a technician")
+      router.push("/unauthorized")
+    }
+  }, [router])
+}
+
 export default function TechnicianDashboardPage() {
+  const router = useRouter()
+  useRoleGuard(router)
   const [requests, setRequests] = useState(technicianBookingRequests)
   const [creditMessage, setCreditMessage] = useState<string | null>(null)
+  const [currentPlan, setCurrentPlan] = useState<any>(null)
   const stats = dashboardStats.technician
   const { user, updateUser } = useUser()
   const { toast } = useToast()
+
+  // Check subscription on mount
+  useEffect(() => {
+    const isOnsite = isOnsiteTechnician()
+    if (isOnsite) {
+      const subscription = getSubscriptionFromStorage()
+      if (!subscription) {
+        // Redirect to subscription selection if no plan exists
+        router.push("/dashboard/technician/subscription")
+      } else {
+        // Get the plan details
+        const plan = subscriptionPlans.find(p => p.id === subscription.plan)
+        setCurrentPlan({ ...subscription, planDetails: plan })
+      }
+    }
+  }, [router])
 
   // Use user data if logged in, otherwise use defaults
   const displayName = user?.name || "Technician"
@@ -25,16 +60,51 @@ export default function TechnicianDashboardPage() {
   const handleAccept = (id: string) => {
     if (!user) return
     
-    // Calculate new credits
-    const newCredits = Math.max(0, user.credits - 1)
+    // Get current subscription
+    const subscription = getSubscriptionFromStorage()
     
-    // Update user credits in state and localStorage
-    updateUser({ credits: newCredits })
+    // Only deduct credits for onsite technicians with active subscription
+    if (isOnsiteTechnician() && subscription) {
+      const credits = subscription.credits as number | "unlimited"
+      
+      // Check if technician has credits
+      if (credits === "unlimited") {
+        // Unlimited credits - allow acceptance
+        setRequests((prev) => prev.map((req) => (req.id === id ? { ...req, status: "confirmed" as const } : req)))
+        setCreditMessage("Job accepted! ✓")
+      } else if (typeof credits === "number" && credits > 0) {
+        // Deduct 1 credit
+        const newCredits = credits - 1
+        subscription.credits = newCredits
+        
+        // Save updated subscription to localStorage
+        localStorage.setItem("technicianSubscription", JSON.stringify(subscription))
+        
+        // Also update user object for consistency
+        updateUser({ credits: newCredits })
+        
+        // Update current plan state for real-time dashboard update
+        const plan = subscriptionPlans.find(p => p.id === subscription.plan)
+        setCurrentPlan({ ...subscription, planDetails: plan })
+        
+        // Show message
+        setCreditMessage(`1 credit deducted. ${newCredits} remaining`)
+        
+        // Update requests
+        setRequests((prev) => prev.map((req) => (req.id === id ? { ...req, status: "confirmed" as const } : req)))
+      } else {
+        // No credits remaining
+        setCreditMessage("No credits available. Upgrade your plan to accept more jobs.")
+        return
+      }
+    } else if (!isOnsiteTechnician()) {
+      // Digital provider - no credit deduction
+      updateUser({ credits: (user.credits || 0) })
+      setRequests((prev) => prev.map((req) => (req.id === id ? { ...req, status: "confirmed" as const } : req)))
+      setCreditMessage("Job accepted! ✓")
+    }
     
-    // Show non-intrusive credit message
-    setCreditMessage(`1 credit deducted. ${newCredits} remaining`)
-    
-    // Auto-dismiss after 2.5 seconds
+    // Auto-dismiss message after 2.5 seconds
     const timeout = setTimeout(() => {
       setCreditMessage(null)
     }, 2500)
@@ -116,6 +186,64 @@ export default function TechnicianDashboardPage() {
             />
           </div>
 
+          {/* Subscription Card */}
+          {currentPlan && (
+            <div className="mb-8 bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl border border-blue-200 p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-blue-600/20 rounded-lg">
+                    <Zap className="w-6 h-6 text-blue-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-foreground">
+                      {currentPlan.planDetails?.name || currentPlan.plan} Plan
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                      {currentPlan.planDetails?.priceLabel || "Your current subscription"}
+                    </p>
+                  </div>
+                </div>
+                <Button
+                  onClick={() => router.push("/dashboard/technician/subscription")}
+                  variant="outline"
+                  className="gap-2"
+                >
+                  Change Plan
+                  <ArrowRight className="w-4 h-4" />
+                </Button>
+              </div>
+              
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <div className="bg-white/50 rounded-lg p-4">
+                  <p className="text-xs text-muted-foreground font-medium mb-1">Service Credits</p>
+                  <p className="text-2xl font-bold text-foreground">
+                    {currentPlan.credits === "unlimited" ? "∞" : currentPlan.credits}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {currentPlan.credits === "unlimited" 
+                      ? "Unlimited" 
+                      : "Monthly credits"
+                    }
+                  </p>
+                </div>
+                <div className="bg-white/50 rounded-lg p-4">
+                  <p className="text-xs text-muted-foreground font-medium mb-1">Plan Status</p>
+                  <p className="text-2xl font-bold text-green-600">Active</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Since {new Date(currentPlan.activationDate).toLocaleDateString()}
+                  </p>
+                </div>
+                <div className="bg-white/50 rounded-lg p-4 col-span-2 md:col-span-1">
+                  <p className="text-xs text-muted-foreground font-medium mb-1">Plan Features</p>
+                  <p className="text-sm font-semibold text-foreground">
+                    {currentPlan.planDetails?.features?.length || 0} features
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">+ Premium support</p>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Booking Requests */}
           <div className="bg-card rounded-2xl shadow-sm overflow-hidden mb-8">
             <div className="px-6 py-4 border-b border-border flex items-center justify-between">
@@ -156,7 +284,13 @@ export default function TechnicianDashboardPage() {
                       <>
                         <Button
                           onClick={() => handleAccept(request.id)}
-                          className="bg-green-600 hover:bg-green-700 text-white"
+                          disabled={currentPlan && currentPlan.credits === 0}
+                          className={`${
+                            currentPlan && currentPlan.credits === 0
+                              ? "bg-gray-400 cursor-not-allowed text-white"
+                              : "bg-green-600 hover:bg-green-700 text-white"
+                          }`}
+                          title={currentPlan && currentPlan.credits === 0 ? "No credits available. Upgrade your plan." : "Accept job request"}
                         >
                           <Check className="w-4 h-4 mr-1" />
                           Accept

@@ -139,9 +139,21 @@ export default function SignUpPage() {
 
     if (!validateForm()) return
 
+    // Determine the role based on selection
+    let finalRole: "digital_provider" | "technician" | "customer" | "service-provider" = selectedRole === "service-provider" ? "service-provider" : "customer";
+    
+    // Convert service-provider + serviceType to new role format
+    if (selectedRole === "service-provider") {
+      if (selectedServiceType === "digital") {
+        finalRole = "digital_provider" as any;
+      } else if (selectedServiceType === "onsite") {
+        finalRole = "technician" as any;
+      }
+    }
+
     // Create user data
     const userData = {
-      role: selectedRole as "service-provider" | "customer",
+      role: finalRole,
       serviceType: selectedServiceType as "onsite" | "digital" | undefined,
       name: formData.name,
       email: formData.email,

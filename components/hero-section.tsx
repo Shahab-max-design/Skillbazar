@@ -21,7 +21,7 @@ export function HeroSection() {
   }
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+    <section className="relative min-h-screen flex items-center justify-center z-[1]">
       {/* Background Image with Overlay */}
       <div className="absolute inset-0 z-0">
         <img
@@ -43,21 +43,21 @@ export function HeroSection() {
 
           {/* Headline */}
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6 animate-fade-in-up animation-delay-100">
-            Find Trusted Technicians
-            <span className="block text-primary">Near You — Instantly</span>
+            Find Trusted Professionals
+            <span className="block text-primary">For Any Job — Instantly</span>
           </h1>
 
           {/* Subheadline */}
           <p className="text-lg sm:text-xl text-gray-300 mb-8 animate-fade-in-up animation-delay-200 max-w-2xl">
-            Connect with verified electricians, plumbers, AC technicians, and more. Book skilled professionals in your
-            area with just a few clicks.
+            From web developers and graphic designers to electricians and plumbers.
+            Hire skilled professionals for both digital and onsite needs.
           </p>
 
           {/* Search Box */}
           <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 sm:p-6 animate-fade-in-up animation-delay-300">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {/* Area Dropdown */}
-              <div className="relative">
+              <div className="relative z-[9999]">
                 <label className="block text-sm text-gray-300 mb-2">Select Area</label>
                 <button
                   onClick={() => {
@@ -73,7 +73,7 @@ export function HeroSection() {
                   <ChevronDown className={`w-4 h-4 transition-transform ${areaOpen ? "rotate-180" : ""}`} />
                 </button>
                 {areaOpen && (
-                  <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-xl border border-border max-h-60 overflow-y-auto z-20 animate-fade-in">
+                  <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-2xl border border-border max-h-60 overflow-y-auto z-[9999] animate-fade-in">
                     {karachiAreas.map((area) => (
                       <button
                         key={area}
@@ -91,7 +91,7 @@ export function HeroSection() {
               </div>
 
               {/* Service Dropdown */}
-              <div className="relative">
+              <div className="relative z-[9999]">
                 <label className="block text-sm text-gray-300 mb-2">Select Service</label>
                 <button
                   onClick={() => {
@@ -107,7 +107,7 @@ export function HeroSection() {
                   <ChevronDown className={`w-4 h-4 transition-transform ${serviceOpen ? "rotate-180" : ""}`} />
                 </button>
                 {serviceOpen && (
-                  <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-xl border border-border max-h-60 overflow-y-auto z-20 animate-fade-in">
+                  <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-2xl border border-border max-h-60 overflow-y-auto z-[9999] animate-fade-in">
                     {services.map((service) => (
                       <button
                         key={service}
@@ -131,7 +131,7 @@ export function HeroSection() {
                   className="w-full bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl py-6 text-lg font-semibold animate-pulse-glow"
                 >
                   <Search className="w-5 h-5 mr-2" />
-                  Find Technician
+                  Find Professional
                 </Button>
               </div>
             </div>
@@ -171,7 +171,7 @@ export function HeroSection() {
           <div className="border-t border-white/20 my-4" />
           <div className="text-center">
             <div className="text-4xl font-bold text-primary mb-1">150+</div>
-            <div className="text-sm text-gray-300">Verified Technicians</div>
+            <div className="text-sm text-gray-300">Verified Pros</div>
           </div>
         </div>
       </div>

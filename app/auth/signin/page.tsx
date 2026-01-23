@@ -45,21 +45,42 @@ export default function SignInPage() {
     try {
       // Attempt login
       const success = loginUser(formData.email, formData.password)
+      console.log("Login attempt:", { email: formData.email, success });
 
       if (success) {
-        // Redirect to appropriate dashboard based on role
+        // Get user data from localStorage
         const user = JSON.parse(localStorage.getItem("skillbazaar_user") || "{}")
-        if (user.role === "customer") {
-          router.push("/dashboard/customer")
-        } else if (user.role === "service-provider") {
-          router.push("/dashboard/technician")
-        } else {
-          router.push("/")
+        console.log("User logged in:", user);
+        
+        // Determine the correct role based on user data
+        let userRole: "digital_provider" | "technician" | "customer" | null = null;
+        
+        // Handle both new and legacy role formats
+        if (user.role === "digital_provider" || (user.role === "service-provider" && user.serviceType === "digital")) {
+          userRole = "digital_provider";
+        } else if (user.role === "onsite_technician" || user.role === "technician" || (user.role === "service-provider" && user.serviceType === "onsite")) {
+          userRole = "technician";
+        } else if (user.role === "customer") {
+          userRole = "customer";
         }
+        
+        console.log("Extracted role:", userRole);
+        
+        // Save the role using standardized key
+        if (userRole) {
+          localStorage.setItem("userRole", userRole);
+          console.log("Role saved to userRole:", userRole);
+        }
+        
+        // Success - redirect to dashboard entry point
+        console.log("Redirecting to dashboard...");
+        window.location.href = "/dashboard";
       } else {
+        console.log("Login failed - invalid credentials");
         setErrors({ email: "Invalid email or password" })
       }
     } catch (error) {
+      console.error("Login error:", error);
       setErrors({ email: "Login failed. Please try again." })
     } finally {
       setIsLoading(false)

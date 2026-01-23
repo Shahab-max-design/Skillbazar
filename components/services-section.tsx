@@ -1,52 +1,148 @@
 "use client"
 
 import Link from "next/link"
-import { Zap, Droplets, Wind, Hammer, Paintbrush, Wrench } from "lucide-react"
+import { Zap, Droplets, Wind, Hammer, Paintbrush, Wrench, Globe, Palette, Monitor, Search, PenTool, Video } from "lucide-react"
 
-const servicesList = [
+const onsiteServices = [
   {
     icon: Zap,
     name: "Electrician",
     description: "Wiring, installations, repairs & more",
     color: "bg-yellow-500",
-    image: "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1621905251918-48416bd8575a?w=400&h=225&fit=crop",
   },
   {
     icon: Droplets,
     name: "Plumber",
     description: "Pipe fitting, leak repairs, fixtures",
     color: "bg-blue-500",
-    image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1584622281867-8d5c35b7db12?w=400&h=225&fit=crop",
   },
   {
     icon: Wind,
     name: "AC Repair",
     description: "Installation, servicing & gas refill",
     color: "bg-cyan-500",
-    image: "https://images.unsplash.com/photo-1585771724684-38269d6639fd?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1585771724684-38269d6639fd?w=400&h=225&fit=crop",
   },
   {
     icon: Hammer,
     name: "Carpenter",
     description: "Furniture, cabinets & woodwork",
     color: "bg-amber-600",
-    image: "https://images.unsplash.com/photo-1504148455328-c376907d081c?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1565629888635-f08b4b0c6f0d?w=400&h=225&fit=crop",
   },
   {
     icon: Paintbrush,
     name: "Painter",
     description: "Interior, exterior & textures",
     color: "bg-rose-500",
-    image: "https://images.unsplash.com/photo-1562259949-e8e7689d7828?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1537633552985-caf1ddac270e?w=400&h=225&fit=crop",
   },
   {
     icon: Wrench,
     name: "Appliance Repair",
     description: "Washing machines, fridges & more",
     color: "bg-primary",
-    image: "https://images.unsplash.com/photo-1581092921461-eab62e97a780?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1581092921461-eab62e97a780?w=400&h=225&fit=crop",
   },
 ]
+
+const digitalServices = [
+  {
+    icon: Globe,
+    name: "Web Developer",
+    description: "Websites, web apps & portals",
+    color: "bg-purple-500",
+    image: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400&h=225&fit=crop",
+  },
+  {
+    icon: Palette,
+    name: "Graphic Designer",
+    description: "Logos, branding & marketing materials",
+    color: "bg-pink-500",
+    image: "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=400&h=225&fit=crop",
+  },
+  {
+    icon: Monitor,
+    name: "UI/UX Designer",
+    description: "User interfaces & experience design",
+    color: "bg-indigo-500",
+    image: "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=400&h=225&fit=crop",
+  },
+  {
+    icon: Search,
+    name: "SEO Specialist",
+    description: "Search engine optimization & rankings",
+    color: "bg-green-600",
+    image: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&h=225&fit=crop",
+  },
+  {
+    icon: PenTool,
+    name: "Content Writer",
+    description: "Blogs, copy & technical writing",
+    color: "bg-orange-500",
+    image: "https://images.unsplash.com/photo-1455165814004-e71c99eed928?w=400&h=225&fit=crop",
+  },
+  {
+    icon: Video,
+    name: "Video Editor",
+    description: "Editing, motion graphics & post-production",
+    color: "bg-red-500",
+    image: "https://images.unsplash.com/photo-1574717436401-063d29143eaf?w=400&h=225&fit=crop",
+  },
+]
+
+function ServiceCard({ service }: { service: any }) {
+  // Determine service type based on service name
+  const isOnsite = ['Electrician', 'Plumber', 'AC Repair', 'Carpenter', 'Painter', 'Appliance Repair'].includes(service.name)
+  const serviceType = isOnsite ? 'onsite' : 'digital'
+
+  // Create service slug - standardized identifier
+  const createServiceSlug = (name: string) => {
+    return name
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-') // Replace special chars with hyphens
+      .replace(/^-+|-+$/g, '') // Remove leading/trailing hyphens
+  }
+
+  const serviceSlug = createServiceSlug(service.name)
+
+  return (
+    <Link
+      href={`/services?type=${serviceType}&service=${serviceSlug}`}
+      className="group relative overflow-hidden rounded-2xl bg-card shadow-sm hover:shadow-xl transition-all duration-300"
+    >
+      {/* Image */}
+      <div className="relative h-48 overflow-hidden">
+        <img
+          src={service.image || "/placeholder.svg"}
+          alt={service.name}
+          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+      </div>
+
+      {/* Content */}
+      <div className="absolute bottom-0 left-0 right-0 p-6">
+        <div className="flex items-center gap-3 mb-2">
+          <div className={`w-10 h-10 ${service.color} rounded-xl flex items-center justify-center`}>
+            <service.icon className="w-5 h-5 text-white" />
+          </div>
+          <h3 className="text-xl font-semibold text-white">{service.name}</h3>
+        </div>
+        <p className="text-gray-300 text-sm">{service.description}</p>
+      </div>
+
+      {/* Hover Arrow */}
+      <div className="absolute top-4 right-4 w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+        <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+        </svg>
+      </div>
+    </Link>
+  )
+}
 
 export function ServicesSection() {
   return (
@@ -55,46 +151,42 @@ export function ServicesSection() {
         <div className="text-center mb-16">
           <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">Our Services</h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            From electrical work to home repairs, we have skilled professionals for all your needs.
+            From technical repairs to digital solutions, we have the right professional for you.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {servicesList.map((service, index) => (
-            <Link
-              key={index}
-              href={`/technicians?service=${service.name}`}
-              className="group relative overflow-hidden rounded-2xl bg-card shadow-sm hover:shadow-xl transition-all duration-300"
-            >
-              {/* Image */}
-              <div className="relative h-48 overflow-hidden">
-                <img
-                  src={service.image || "/placeholder.svg"}
-                  alt={service.name}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
-              </div>
+        {/* Digital Services */}
+        <div className="mb-16">
+          <div className="flex items-center gap-3 mb-8">
+            <div className="h-0.5 flex-1 bg-border"></div>
+            <h3 className="text-2xl font-bold text-primary flex items-center gap-2">
+              <Globe className="w-6 h-6" />
+              Digital Services
+            </h3>
+            <div className="h-0.5 flex-1 bg-border"></div>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {digitalServices.map((service, index) => (
+              <ServiceCard key={index} service={service} />
+            ))}
+          </div>
+        </div>
 
-              {/* Content */}
-              <div className="absolute bottom-0 left-0 right-0 p-6">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className={`w-10 h-10 ${service.color} rounded-xl flex items-center justify-center`}>
-                    <service.icon className="w-5 h-5 text-white" />
-                  </div>
-                  <h3 className="text-xl font-semibold text-white">{service.name}</h3>
-                </div>
-                <p className="text-gray-300 text-sm">{service.description}</p>
-              </div>
-
-              {/* Hover Arrow */}
-              <div className="absolute top-4 right-4 w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                </svg>
-              </div>
-            </Link>
-          ))}
+        {/* Onsite Services */}
+        <div>
+          <div className="flex items-center gap-3 mb-8">
+            <div className="h-0.5 flex-1 bg-border"></div>
+            <h3 className="text-2xl font-bold text-primary flex items-center gap-2">
+              <Wrench className="w-6 h-6" />
+              Onsite Services
+            </h3>
+            <div className="h-0.5 flex-1 bg-border"></div>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {onsiteServices.map((service, index) => (
+              <ServiceCard key={index} service={service} />
+            ))}
+          </div>
         </div>
       </div>
     </section>
