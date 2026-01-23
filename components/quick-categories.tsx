@@ -28,7 +28,7 @@ const CATEGORIES: Category[] = [
     description: "Professional website design services",
     color: "bg-blue-500",
     bgColor: "bg-blue-50",
-    image: "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=500&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=800&h=600&fit=crop&q=85&auto=format",
     serviceSlug: "web-development",
   },
   {
@@ -39,7 +39,7 @@ const CATEGORIES: Category[] = [
     description: "Creative graphic design solutions",
     color: "bg-purple-500",
     bgColor: "bg-purple-50",
-    image: "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=500&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=800&h=600&fit=crop&q=85&auto=format",
     serviceSlug: "graphic-design",
   },
   {
@@ -50,7 +50,7 @@ const CATEGORIES: Category[] = [
     description: "High-quality content creation",
     color: "bg-pink-500",
     bgColor: "bg-pink-50",
-    image: "https://images.unsplash.com/photo-1455165814004-e71c99eed928?w=500&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=800&h=600&fit=crop&q=85&auto=format",
     serviceSlug: "content-writing",
   },
   {
@@ -61,7 +61,7 @@ const CATEGORIES: Category[] = [
     description: "Professional plumbing services",
     color: "bg-orange-500",
     bgColor: "bg-orange-50",
-    image: "https://images.unsplash.com/photo-1584622281867-8d5c35b7db12?w=500&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1621905251918-48416bd8575a?w=800&h=600&fit=crop&q=85&auto=format",
   },
   {
     id: "electrician",
@@ -71,7 +71,7 @@ const CATEGORIES: Category[] = [
     description: "Licensed electrical work",
     color: "bg-yellow-500",
     bgColor: "bg-yellow-50",
-    image: "https://images.unsplash.com/photo-1621905251918-48416bd8575a?w=500&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=800&h=600&fit=crop&q=85&auto=format",
   },
   {
     id: "carpenter",
@@ -81,7 +81,7 @@ const CATEGORIES: Category[] = [
     description: "Expert carpentry and woodwork",
     color: "bg-amber-600",
     bgColor: "bg-amber-50",
-    image: "https://images.unsplash.com/photo-1565629888635-f08b4b0c6f0d?w=500&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&h=600&fit=crop&q=85&auto=format",
   },
 ]
 
@@ -128,15 +128,19 @@ export function QuickCategories() {
             >
               {/* Image Section */}
               <div className="relative h-40 overflow-hidden bg-gray-200">
-                <img
+                <Image
                   src={category.image}
-                  alt={category.name}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                  alt={`${category.name} service`}
+                  fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  className="object-cover group-hover:scale-110 transition-transform duration-300"
+                  loading="lazy"
+                  quality={85}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
                 
                 {/* Badge on Image */}
-                <div className="absolute top-3 right-3">
+                <div className="absolute top-3 right-3 z-10">
                   <Badge className={badgeColor} variant="secondary">
                     {category.type === "digital" ? "Digital" : "Onsite"}
                   </Badge>

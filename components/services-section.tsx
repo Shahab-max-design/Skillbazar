@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { Zap, Droplets, Wind, Hammer, Paintbrush, Wrench, Globe, Palette, Monitor, Search, PenTool, Video } from "lucide-react"
 
 const onsiteServices = [
@@ -9,42 +10,42 @@ const onsiteServices = [
     name: "Electrician",
     description: "Wiring, installations, repairs & more",
     color: "bg-yellow-500",
-    image: "https://images.unsplash.com/photo-1621905251918-48416bd8575a?w=400&h=225&fit=crop",
+    image: "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=800&h=600&fit=crop&q=85&auto=format",
   },
   {
     icon: Droplets,
     name: "Plumber",
     description: "Pipe fitting, leak repairs, fixtures",
     color: "bg-blue-500",
-    image: "https://images.unsplash.com/photo-1584622281867-8d5c35b7db12?w=400&h=225&fit=crop",
+    image: "https://images.unsplash.com/photo-1621905251918-48416bd8575a?w=800&h=600&fit=crop&q=85&auto=format",
   },
   {
     icon: Wind,
     name: "AC Repair",
     description: "Installation, servicing & gas refill",
     color: "bg-cyan-500",
-    image: "https://images.unsplash.com/photo-1585771724684-38269d6639fd?w=400&h=225&fit=crop",
+    image: "https://images.unsplash.com/photo-1585771724684-38269d6639fd?w=800&h=600&fit=crop&q=85&auto=format",
   },
   {
     icon: Hammer,
     name: "Carpenter",
     description: "Furniture, cabinets & woodwork",
     color: "bg-amber-600",
-    image: "https://images.unsplash.com/photo-1565629888635-f08b4b0c6f0d?w=400&h=225&fit=crop",
+    image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&h=600&fit=crop&q=85&auto=format",
   },
   {
     icon: Paintbrush,
     name: "Painter",
     description: "Interior, exterior & textures",
     color: "bg-rose-500",
-    image: "https://images.unsplash.com/photo-1537633552985-caf1ddac270e?w=400&h=225&fit=crop",
+    image: "https://images.unsplash.com/photo-1537633552985-caf1ddac270e?w=800&h=600&fit=crop&q=85&auto=format",
   },
   {
     icon: Wrench,
     name: "Appliance Repair",
     description: "Washing machines, fridges & more",
     color: "bg-primary",
-    image: "https://images.unsplash.com/photo-1581092921461-eab62e97a780?w=400&h=225&fit=crop",
+    image: "https://images.unsplash.com/photo-1581092921461-eab62e97a780?w=800&h=600&fit=crop&q=85&auto=format",
   },
 ]
 
@@ -54,42 +55,42 @@ const digitalServices = [
     name: "Web Developer",
     description: "Websites, web apps & portals",
     color: "bg-purple-500",
-    image: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400&h=225&fit=crop",
+    image: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=800&h=600&fit=crop&q=85&auto=format",
   },
   {
     icon: Palette,
     name: "Graphic Designer",
     description: "Logos, branding & marketing materials",
     color: "bg-pink-500",
-    image: "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=400&h=225&fit=crop",
+    image: "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=800&h=600&fit=crop&q=85&auto=format",
   },
   {
     icon: Monitor,
     name: "UI/UX Designer",
     description: "User interfaces & experience design",
     color: "bg-indigo-500",
-    image: "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=400&h=225&fit=crop",
+    image: "https://images.unsplash.com/photo-1586717791821-3f44a563fa4c?w=800&h=600&fit=crop&q=85&auto=format",
   },
   {
     icon: Search,
     name: "SEO Specialist",
     description: "Search engine optimization & rankings",
     color: "bg-green-600",
-    image: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&h=225&fit=crop",
+    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=600&fit=crop&q=85&auto=format",
   },
   {
     icon: PenTool,
     name: "Content Writer",
     description: "Blogs, copy & technical writing",
     color: "bg-orange-500",
-    image: "https://images.unsplash.com/photo-1455165814004-e71c99eed928?w=400&h=225&fit=crop",
+    image: "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=800&h=600&fit=crop&q=85&auto=format",
   },
   {
     icon: Video,
     name: "Video Editor",
     description: "Editing, motion graphics & post-production",
     color: "bg-red-500",
-    image: "https://images.unsplash.com/photo-1574717436401-063d29143eaf?w=400&h=225&fit=crop",
+    image: "https://images.unsplash.com/photo-1574717436401-063d29143eaf?w=800&h=600&fit=crop&q=85&auto=format",
   },
 ]
 
@@ -115,10 +116,14 @@ function ServiceCard({ service }: { service: any }) {
     >
       {/* Image */}
       <div className="relative h-48 overflow-hidden">
-        <img
+        <Image
           src={service.image || "/placeholder.svg"}
-          alt={service.name}
-          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+          alt={`${service.name} service`}
+          fill
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          className="object-cover group-hover:scale-110 transition-transform duration-500"
+          loading="lazy"
+          quality={85}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
       </div>

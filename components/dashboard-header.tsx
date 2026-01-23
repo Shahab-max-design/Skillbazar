@@ -1,8 +1,8 @@
 "use client"
 
-import { useState } from "react"
 import Link from "next/link"
-import { Menu, X, Bell, User, Wrench } from "lucide-react"
+import { Menu, Bell, User, Wrench } from "lucide-react"
+import { useSidebar } from "./sidebar-context"
 
 interface DashboardHeaderProps {
   title: string
@@ -11,14 +11,18 @@ interface DashboardHeaderProps {
 }
 
 export function DashboardHeader({ title, userName, userRole }: DashboardHeaderProps) {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const { toggleMobile } = useSidebar()
 
   return (
     <header className="sticky top-0 z-30 bg-background/80 backdrop-blur-md border-b border-border">
       <div className="flex items-center justify-between h-16 px-4 lg:px-8">
-        {/* Mobile Menu Toggle */}
-        <button className="lg:hidden p-2 -ml-2" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
-          {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+        {/* Mobile Menu Toggle - Connected to Sidebar */}
+        <button 
+          className="lg:hidden p-2 -ml-2 rounded-lg hover:bg-muted transition-colors" 
+          onClick={toggleMobile}
+          aria-label="Toggle sidebar"
+        >
+          <Menu className="w-6 h-6 text-foreground" />
         </button>
 
         {/* Mobile Logo */}
@@ -51,42 +55,6 @@ export function DashboardHeader({ title, userName, userRole }: DashboardHeaderPr
           </div>
         </div>
       </div>
-
-      {/* Mobile Navigation - Would include sidebar links */}
-      {mobileMenuOpen && (
-        <div className="lg:hidden border-t border-border bg-background p-4 animate-fade-in">
-          <nav className="space-y-2">
-            <Link
-              href="/dashboard/customer"
-              className="block px-4 py-2 rounded-lg hover:bg-muted text-foreground"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Customer Dashboard
-            </Link>
-            <Link
-              href="/dashboard/technician"
-              className="block px-4 py-2 rounded-lg hover:bg-muted text-foreground"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Technician Dashboard
-            </Link>
-            <Link
-              href="/dashboard/admin"
-              className="block px-4 py-2 rounded-lg hover:bg-muted text-foreground"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Admin Dashboard
-            </Link>
-            <Link
-              href="/"
-              className="block px-4 py-2 rounded-lg hover:bg-muted text-foreground"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Back to Home
-            </Link>
-          </nav>
-        </div>
-      )}
     </header>
   )
 }

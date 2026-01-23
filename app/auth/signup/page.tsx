@@ -50,7 +50,6 @@ export default function SignUpPage() {
     phone: "",
     password: "",
     confirmPassword: "",
-    profilePicture: "",
     // Service Provider - Onsite
     area: "",
     onsiteServices: [] as string[],
@@ -141,7 +140,7 @@ export default function SignUpPage() {
 
     // Determine the role based on selection
     let finalRole: "digital_provider" | "technician" | "customer" | "service-provider" = selectedRole === "service-provider" ? "service-provider" : "customer";
-    
+
     // Convert service-provider + serviceType to new role format
     if (selectedRole === "service-provider") {
       if (selectedServiceType === "digital") {
@@ -159,7 +158,6 @@ export default function SignUpPage() {
       email: formData.email,
       phone: formData.phone,
       password: formData.password,
-      profilePicture: formData.profilePicture,
       area: selectedServiceType === "onsite" ? formData.area : undefined,
       onsiteServices: selectedServiceType === "onsite" ? formData.onsiteServices : undefined,
       digitalSkills: selectedServiceType === "digital" ? formData.digitalSkills : undefined,
@@ -321,11 +319,10 @@ export default function SignUpPage() {
                         key={service}
                         type="button"
                         onClick={() => toggleService(service, "onsite")}
-                        className={`p-3 rounded-lg border-2 transition-all text-sm font-medium flex items-center gap-2 ${
-                          formData.onsiteServices.includes(service)
+                        className={`p-3 rounded-lg border-2 transition-all text-sm font-medium flex items-center gap-2 ${formData.onsiteServices.includes(service)
                             ? "border-primary bg-primary/10 text-primary"
                             : "border-border text-muted-foreground hover:border-primary"
-                        }`}
+                          }`}
                       >
                         {formData.onsiteServices.includes(service) && (
                           <Check className="w-4 h-4" />
@@ -351,11 +348,10 @@ export default function SignUpPage() {
                         key={skill}
                         type="button"
                         onClick={() => toggleService(skill, "digital")}
-                        className={`p-3 rounded-lg border-2 transition-all text-sm font-medium flex items-center gap-2 ${
-                          formData.digitalSkills.includes(skill)
+                        className={`p-3 rounded-lg border-2 transition-all text-sm font-medium flex items-center gap-2 ${formData.digitalSkills.includes(skill)
                             ? "border-primary bg-primary/10 text-primary"
                             : "border-border text-muted-foreground hover:border-primary"
-                        }`}
+                          }`}
                       >
                         {formData.digitalSkills.includes(skill) && (
                           <Check className="w-4 h-4" />
@@ -497,21 +493,6 @@ export default function SignUpPage() {
                 className="rounded-xl border-border focus-visible:ring-primary"
               />
               {errors.confirmPassword && <p className="text-sm text-red-500">{errors.confirmPassword}</p>}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="profilePicture" className="text-sm font-medium">
-                Profile Picture (Optional)
-              </Label>
-              <Input
-                id="profilePicture"
-                name="profilePicture"
-                type="url"
-                placeholder="https://..."
-                value={formData.profilePicture}
-                onChange={handleInputChange}
-                className="rounded-xl border-border focus-visible:ring-primary"
-              />
             </div>
 
             {/* Submit Button */}

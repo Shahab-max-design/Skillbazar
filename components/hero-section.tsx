@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { Search, MapPin, ChevronDown, Star, Shield, Clock } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -12,6 +12,45 @@ export function HeroSection() {
   const [selectedService, setSelectedService] = useState("All Services")
   const [areaOpen, setAreaOpen] = useState(false)
   const [serviceOpen, setServiceOpen] = useState(false)
+  const areaRef = useRef<HTMLDivElement>(null)
+  const serviceRef = useRef<HTMLDivElement>(null)
+
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (areaRef.current && !areaRef.current.contains(event.target as Node)) {
+        setAreaOpen(false)
+      }
+      if (serviceRef.current && !serviceRef.current.contains(event.target as Node)) {
+        setServiceOpen(false)
+      }
+    }
+
+    if (areaOpen || serviceOpen) {
+      document.addEventListener("mousedown", handleClickOutside)
+      // Prevent body scroll when dropdown is open
+      document.body.style.overflow = "hidden"
+    } else {
+      document.body.style.overflow = ""
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside)
+      document.body.style.overflow = ""
+    }
+  }, [areaOpen, serviceOpen])
+
+  // Close dropdowns on escape key
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setAreaOpen(false)
+        setServiceOpen(false)
+      }
+    }
+    document.addEventListener("keydown", handleEscape)
+    return () => document.removeEventListener("keydown", handleEscape)
+  }, [])
 
   const handleSearch = () => {
     const params = new URLSearchParams()
@@ -54,17 +93,19 @@ export function HeroSection() {
           </p>
 
           {/* Search Box */}
-          <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 sm:p-6 animate-fade-in-up animation-delay-300">
+          <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 sm:p-6 animate-fade-in-up animation-delay-300 relative z-20">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {/* Area Dropdown */}
-              <div className="relative z-[9999]">
+              <div className="relative" ref={areaRef}>
                 <label className="block text-sm text-gray-300 mb-2">Select Area</label>
                 <button
                   onClick={() => {
                     setAreaOpen(!areaOpen)
                     setServiceOpen(false)
                   }}
-                  className="w-full flex items-center justify-between bg-white rounded-xl px-4 py-3 text-foreground hover:ring-2 hover:ring-primary transition-all"
+                  className="w-full flex items-center justify-between bg-white rounded-xl px-4 py-3 text-foreground hover:ring-2 hover:ring-primary transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary"
+                  aria-expanded={areaOpen}
+                  aria-haspopup="listbox"
                 >
                   <span className="flex items-center gap-2">
                     <MapPin className="w-4 h-4 text-primary" />
@@ -73,32 +114,45 @@ export function HeroSection() {
                   <ChevronDown className={`w-4 h-4 transition-transform ${areaOpen ? "rotate-180" : ""}`} />
                 </button>
                 {areaOpen && (
-                  <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-2xl border border-border max-h-60 overflow-y-auto z-[9999] animate-fade-in">
-                    {karachiAreas.map((area) => (
-                      <button
-                        key={area}
-                        onClick={() => {
-                          setSelectedArea(area)
-                          setAreaOpen(false)
-                        }}
-                        className="w-full text-left px-4 py-3 hover:bg-muted transition-colors text-foreground first:rounded-t-xl last:rounded-b-xl"
-                      >
-                        {area}
-                      </button>
-                    ))}
-                  </div>
+                  <>
+                    {/* Backdrop overlay */}
+                    <div 
+                      className="fixed inset-0 bg-black/20 z-[100]"
+                      onClick={() => setAreaOpen(false)}
+                      aria-hidden="true"
+                    />
+                    {/* Dropdown menu */}
+                    <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-2xl border border-border max-h-60 overflow-y-auto z-[101] animate-fade-in scroll-smooth overscroll-contain">
+                      <div className="py-1">
+                        {karachiAreas.map((area) => (
+                          <button
+                            key={area}
+                            onClick={() => {
+                              setSelectedArea(area)
+                              setAreaOpen(false)
+                            }}
+                            className="w-full text-left px-4 py-3 hover:bg-muted transition-colors text-foreground first:rounded-t-xl last:rounded-b-xl cursor-pointer focus:outline-none focus:bg-muted"
+                          >
+                            {area}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </>
                 )}
               </div>
 
               {/* Service Dropdown */}
-              <div className="relative z-[9999]">
+              <div className="relative" ref={serviceRef}>
                 <label className="block text-sm text-gray-300 mb-2">Select Service</label>
                 <button
                   onClick={() => {
                     setServiceOpen(!serviceOpen)
                     setAreaOpen(false)
                   }}
-                  className="w-full flex items-center justify-between bg-white rounded-xl px-4 py-3 text-foreground hover:ring-2 hover:ring-primary transition-all"
+                  className="w-full flex items-center justify-between bg-white rounded-xl px-4 py-3 text-foreground hover:ring-2 hover:ring-primary transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary"
+                  aria-expanded={serviceOpen}
+                  aria-haspopup="listbox"
                 >
                   <span className="flex items-center gap-2">
                     <Search className="w-4 h-4 text-primary" />
@@ -107,20 +161,31 @@ export function HeroSection() {
                   <ChevronDown className={`w-4 h-4 transition-transform ${serviceOpen ? "rotate-180" : ""}`} />
                 </button>
                 {serviceOpen && (
-                  <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-2xl border border-border max-h-60 overflow-y-auto z-[9999] animate-fade-in">
-                    {services.map((service) => (
-                      <button
-                        key={service}
-                        onClick={() => {
-                          setSelectedService(service)
-                          setServiceOpen(false)
-                        }}
-                        className="w-full text-left px-4 py-3 hover:bg-muted transition-colors text-foreground first:rounded-t-xl last:rounded-b-xl"
-                      >
-                        {service}
-                      </button>
-                    ))}
-                  </div>
+                  <>
+                    {/* Backdrop overlay */}
+                    <div 
+                      className="fixed inset-0 bg-black/20 z-[100]"
+                      onClick={() => setServiceOpen(false)}
+                      aria-hidden="true"
+                    />
+                    {/* Dropdown menu */}
+                    <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-2xl border border-border max-h-60 overflow-y-auto z-[101] animate-fade-in scroll-smooth overscroll-contain">
+                      <div className="py-1">
+                        {services.map((service) => (
+                          <button
+                            key={service}
+                            onClick={() => {
+                              setSelectedService(service)
+                              setServiceOpen(false)
+                            }}
+                            className="w-full text-left px-4 py-3 hover:bg-muted transition-colors text-foreground first:rounded-t-xl last:rounded-b-xl cursor-pointer focus:outline-none focus:bg-muted"
+                          >
+                            {service}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </>
                 )}
               </div>
 

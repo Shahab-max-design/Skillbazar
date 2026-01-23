@@ -1,8 +1,23 @@
+"use client"
+
+import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, Briefcase } from "lucide-react"
 
 export function CTASection() {
+  const router = useRouter()
+
+  const handleJoinAsTechnician = () => {
+    // Navigate to signup page - the signup page will handle role selection
+    router.push("/auth/signup")
+  }
+
+  const handleFindTechnician = () => {
+    // Navigate to technicians listing page
+    router.push("/technicians")
+  }
+
   return (
     <section className="py-20 bg-primary">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -13,12 +28,14 @@ export function CTASection() {
             <p className="text-lg text-primary-foreground/80 mb-6">
               Find trusted technicians in your area and get your problems solved today.
             </p>
-            <Link href="/technicians">
-              <Button size="lg" className="bg-white text-primary hover:bg-gray-100">
-                Find a Technician
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </Button>
-            </Link>
+            <Button 
+              size="lg" 
+              className="bg-white text-primary hover:bg-gray-100 cursor-pointer focus:outline-none focus:ring-2 focus:ring-white/50"
+              onClick={handleFindTechnician}
+            >
+              Find a Technician
+              <ArrowRight className="w-5 h-5 ml-2" />
+            </Button>
           </div>
 
           {/* For Technicians */}
@@ -33,7 +50,8 @@ export function CTASection() {
             <Button
               variant="outline"
               size="lg"
-              className="border-white text-primary-foreground hover:bg-white/20 bg-transparent"
+              className="border-white text-primary-foreground hover:bg-white/20 bg-transparent cursor-pointer focus:outline-none focus:ring-2 focus:ring-white/50"
+              onClick={handleJoinAsTechnician}
             >
               Join as Technician
             </Button>

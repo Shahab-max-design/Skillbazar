@@ -2,6 +2,7 @@
 
 import { useEffect, ReactNode } from "react"
 import { useRouter, usePathname } from "next/navigation"
+import { SidebarProvider } from "@/components/sidebar-context"
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   const router = useRouter()
@@ -40,5 +41,9 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
     }
   }, [pathname, router])
 
-  return <>{children}</>
+  return (
+    <SidebarProvider>
+      {children}
+    </SidebarProvider>
+  )
 }
