@@ -17,29 +17,46 @@ export default function SubscriptionPage() {
 
   const handleSelectPlan = (planId: string) => {
     setIsProcessing(true)
-    
+    setSelectedPlan(planId)
+
     // Simulate processing
     setTimeout(() => {
+      // Get plan details
+      const plan = subscriptionPlans.find(p => p.id === planId)
+      const creditAmount = plan?.credits === "unlimited" ? 99999 : (typeof plan?.credits === "number" ? plan.credits : 0)
+
       // Store subscription info in localStorage
       const subscriptionData = {
         technicianId: localStorage.getItem("technicianId") || "tech-" + Date.now(),
         plan: planId as "free" | "basic" | "standard" | "premium",
-        credits: planId === "premium" ? 9999 : subscriptionPlans.find(p => p.id === planId)?.credits || 3,
+        credits: creditAmount,
         activationDate: new Date().toISOString(),
       }
-      
+
       localStorage.setItem("technicianSubscription", JSON.stringify(subscriptionData))
-      
+
+      // Log transaction
+      import("@/lib/credits").then(({ addTransaction }) => {
+        addTransaction({
+          amount: creditAmount,
+          type: "purchase",
+          reason: `Subscription Purchase (${planId} Plan)`
+        })
+      })
+
+      // Dispatch event to update dashboard immediately
+      window.dispatchEvent(new Event("credits-updated"))
+
       // Redirect to technician dashboard
       setIsProcessing(false)
       router.push("/dashboard/technician")
-    }, 600)
+    }, 800)
   }
 
   return (
     <main className="min-h-screen bg-muted">
       <Navbar />
-      
+
       <div className="container mx-auto px-4 py-8 lg:py-12">
         {/* Header */}
         <div className="mb-12 text-center">
@@ -57,8 +74,8 @@ export default function SubscriptionPage() {
             <Card
               key={plan.id}
               className={`relative flex flex-col transition-all duration-300 overflow-hidden cursor-pointer
-                ${selectedPlan === plan.id 
-                  ? "ring-2 ring-green-500 shadow-lg scale-105" 
+                ${selectedPlan === plan.id
+                  ? "ring-2 ring-green-500 shadow-lg scale-105"
                   : "hover:shadow-lg hover:scale-102"
                 }
                 ${plan.color}
@@ -87,8 +104,8 @@ export default function SubscriptionPage() {
                 {/* Credits */}
                 <div className="mb-6 p-3 bg-white/50 rounded-lg">
                   <p className="text-sm font-semibold text-foreground">
-                    {plan.credits === "unlimited" 
-                      ? "Unlimited Credits" 
+                    {plan.credits === "unlimited"
+                      ? "Unlimited Credits"
                       : `${plan.credits} Monthly Credits`
                     }
                   </p>
@@ -114,19 +131,18 @@ export default function SubscriptionPage() {
                 <Button
                   onClick={() => handleSelectPlan(plan.id)}
                   disabled={isProcessing}
-                  className={`w-full ${
-                    selectedPlan === plan.id
+                  className={`w-full ${selectedPlan === plan.id
                       ? "bg-green-600 hover:bg-green-700 text-white"
                       : plan.recommended
-                      ? "bg-blue-600 hover:bg-blue-700 text-white"
-                      : "bg-gray-600 hover:bg-gray-700 text-white"
-                  }`}
+                        ? "bg-blue-600 hover:bg-blue-700 text-white"
+                        : "bg-gray-600 hover:bg-gray-700 text-white"
+                    }`}
                 >
-                  {isProcessing && selectedPlan === plan.id 
-                    ? "Processing..." 
-                    : selectedPlan === plan.id 
-                    ? "Selected ✓" 
-                    : "Select Plan"
+                  {isProcessing && selectedPlan === plan.id
+                    ? "Processing..."
+                    : selectedPlan === plan.id
+                      ? "Selected ✓"
+                      : "Select Plan"
                   }
                 </Button>
               </div>
@@ -141,28 +157,28 @@ export default function SubscriptionPage() {
             <div>
               <h3 className="font-semibold text-foreground mb-2">Service Credits</h3>
               <p className="text-sm text-muted-foreground">
-                Each time you accept or respond to a customer request, one service credit is deducted. 
+                Each time you accept or respond to a customer request, one service credit is deducted.
                 When credits reach zero, you'll need to upgrade to continue accepting requests.
               </p>
             </div>
             <div>
               <h3 className="font-semibold text-foreground mb-2">Flexible Plans</h3>
               <p className="text-sm text-muted-foreground">
-                Start with any plan and upgrade or downgrade anytime. There are no hidden charges. 
+                Start with any plan and upgrade or downgrade anytime. There are no hidden charges.
                 Billing is monthly and you can cancel anytime.
               </p>
             </div>
             <div>
               <h3 className="font-semibold text-foreground mb-2">Profile Visibility</h3>
               <p className="text-sm text-muted-foreground">
-                Higher-tier plans get better visibility in customer searches, helping you attract 
+                Higher-tier plans get better visibility in customer searches, helping you attract
                 more qualified leads and bookings.
               </p>
             </div>
             <div>
               <h3 className="font-semibold text-foreground mb-2">Premium Support</h3>
               <p className="text-sm text-muted-foreground">
-                Premium and Standard plans include priority support to help you succeed 
+                Premium and Standard plans include priority support to help you succeed
                 and grow your service business.
               </p>
             </div>

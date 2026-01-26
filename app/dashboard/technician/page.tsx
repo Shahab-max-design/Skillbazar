@@ -8,6 +8,8 @@ import { StatCard } from "@/components/stat-card"
 import { EditProfileDialog } from "@/components/edit-profile-dialog"
 import { technicianBookingRequests, dashboardStats, subscriptionPlans } from "@/lib/data"
 import { getSubscriptionFromStorage, isOnsiteTechnician } from "@/lib/subscription"
+import { deductCreditsForJob, canAcceptJob, refundCreditsForJob, getJobCost } from "@/lib/credits"
+import { CreditHistory } from "@/components/credit-history"
 import { Wallet, TrendingUp, Briefcase, Clock, Star, Check, X, Coins, Zap, ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useUser } from "@/hooks/use-user"
@@ -37,6 +39,9 @@ export default function TechnicianDashboardPage() {
   const { user, updateUser } = useUser()
   const { toast } = useToast()
 
+  // Polling for credit updates (simple way to keep UI in sync)
+  const [refreshTrigger, setRefreshTrigger] = useState(0)
+
   // Check subscription on mount
   useEffect(() => {
     const isOnsite = isOnsiteTechnician()
@@ -51,7 +56,7 @@ export default function TechnicianDashboardPage() {
         setCurrentPlan({ ...subscription, planDetails: plan })
       }
     }
-  }, [router])
+  }, [router, refreshTrigger])
 
   // Use user data if logged in, otherwise use defaults
   const displayName = user?.name || "Technician"
@@ -59,63 +64,81 @@ export default function TechnicianDashboardPage() {
 
   const handleAccept = (id: string) => {
     if (!user) return
-    
+
     // Get current subscription
     const subscription = getSubscriptionFromStorage()
-    
+
     // Only deduct credits for onsite technicians with active subscription
     if (isOnsiteTechnician() && subscription) {
-      const credits = subscription.credits as number | "unlimited"
-      
-      // Check if technician has credits
-      if (credits === "unlimited") {
-        // Unlimited credits - allow acceptance
-        setRequests((prev) => prev.map((req) => (req.id === id ? { ...req, status: "confirmed" as const } : req)))
-        setCreditMessage("Job accepted! ✓")
-      } else if (typeof credits === "number" && credits > 0) {
-        // Deduct 1 credit
-        const newCredits = credits - 1
-        subscription.credits = newCredits
-        
-        // Save updated subscription to localStorage
-        localStorage.setItem("technicianSubscription", JSON.stringify(subscription))
-        
-        // Also update user object for consistency
-        updateUser({ credits: newCredits })
-        
-        // Update current plan state for real-time dashboard update
-        const plan = subscriptionPlans.find(p => p.id === subscription.plan)
-        setCurrentPlan({ ...subscription, planDetails: plan })
-        
-        // Show message
-        setCreditMessage(`1 credit deducted. ${newCredits} remaining`)
-        
-        // Update requests
-        setRequests((prev) => prev.map((req) => (req.id === id ? { ...req, status: "confirmed" as const } : req)))
+      const currentCredits = typeof subscription.credits === "number" ? subscription.credits : 999999
+
+      // Deduct credits logic
+      if (canAcceptJob(subscription.credits)) {
+        const result = deductCreditsForJob(id, currentCredits)
+
+        if (result.success) {
+          // Update subscription storage
+          subscription.credits = result.newBalance
+          localStorage.setItem("technicianSubscription", JSON.stringify(subscription))
+
+          // Update user context
+          updateUser({ credits: result.newBalance })
+
+          // Show message
+          setCreditMessage(`2 credits deducted. ${result.newBalance} credits remaining.`)
+
+          // Update local state to trigger re-render
+          setRefreshTrigger(prev => prev + 1)
+
+          // Update request status
+          setRequests((prev) => prev.map((req) => (req.id === id ? { ...req, status: "confirmed" as const } : req)))
+
+          // Dispatch event for history component
+          window.dispatchEvent(new Event("credits-updated"))
+        } else {
+          setCreditMessage(result.error || "Failed to accept job.")
+        }
       } else {
-        // No credits remaining
-        setCreditMessage("No credits available. Upgrade your plan to accept more jobs.")
-        return
+        setCreditMessage("Insufficient credits. Upgrade your plan to accept more jobs.")
       }
+
     } else if (!isOnsiteTechnician()) {
       // Digital provider - no credit deduction
       updateUser({ credits: (user.credits || 0) })
       setRequests((prev) => prev.map((req) => (req.id === id ? { ...req, status: "confirmed" as const } : req)))
       setCreditMessage("Job accepted! ✓")
     }
-    
-    // Auto-dismiss message after 2.5 seconds
-    const timeout = setTimeout(() => {
-      setCreditMessage(null)
-    }, 2500)
 
-    setRequests((prev) => prev.map((req) => (req.id === id ? { ...req, status: "confirmed" as const } : req)))
-    
-    return () => clearTimeout(timeout)
+    // Auto-dismiss message
+    setTimeout(() => setCreditMessage(null), 3500)
   }
 
   const handleReject = (id: string) => {
+    // Rejection does not deduct credits
     setRequests((prev) => prev.map((req) => (req.id === id ? { ...req, status: "cancelled" as const } : req)))
+  }
+
+  // Temporary function to simulate cancellation/refund
+  const handleSimulateCancel = (id: string) => {
+    if (!isOnsiteTechnician()) return
+
+    const subscription = getSubscriptionFromStorage()
+    if (subscription && typeof subscription.credits === "number") {
+      const result = refundCreditsForJob(id, subscription.credits)
+
+      if (result.success) {
+        subscription.credits = result.newBalance
+        localStorage.setItem("technicianSubscription", JSON.stringify(subscription))
+        updateUser({ credits: result.newBalance })
+        setRefreshTrigger(prev => prev + 1)
+        setCreditMessage(`2 credits refunded. ${result.newBalance} credits available.`)
+        window.dispatchEvent(new Event("credits-updated"))
+
+        // Reset status for demo
+        setRequests((prev) => prev.map((req) => (req.id === id ? { ...req, status: "cancelled" as const } : req)))
+      }
+    }
+    setTimeout(() => setCreditMessage(null), 3500)
   }
 
   const handleProfileSave = (updatedUser: typeof user) => {
@@ -128,6 +151,11 @@ export default function TechnicianDashboardPage() {
       })
     }
   }
+
+  // Calculate job capacity
+  const jobCapacity = currentPlan && typeof currentPlan.credits === "number"
+    ? Math.floor(currentPlan.credits / 2)
+    : (currentPlan?.credits === "unlimited" ? "Unlimited" : 0)
 
   return (
     <div className="min-h-screen bg-muted">
@@ -179,9 +207,9 @@ export default function TechnicianDashboardPage() {
             />
             <StatCard
               title="Credits Available"
-              value={user?.credits ?? 10}
+              value={currentPlan?.credits ?? 0}
               icon={<Coins className="w-6 h-6" />}
-              subtitle="1 credit per job"
+              subtitle={`${jobCapacity} Jobs Capacity`}
               color="primary"
             />
           </div>
@@ -212,7 +240,7 @@ export default function TechnicianDashboardPage() {
                   <ArrowRight className="w-4 h-4" />
                 </Button>
               </div>
-              
+
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 <div className="bg-white/50 rounded-lg p-4">
                   <p className="text-xs text-muted-foreground font-medium mb-1">Service Credits</p>
@@ -220,8 +248,8 @@ export default function TechnicianDashboardPage() {
                     {currentPlan.credits === "unlimited" ? "∞" : currentPlan.credits}
                   </p>
                   <p className="text-xs text-muted-foreground mt-1">
-                    {currentPlan.credits === "unlimited" 
-                      ? "Unlimited" 
+                    {currentPlan.credits === "unlimited"
+                      ? "Unlimited"
                       : "Monthly credits"
                     }
                   </p>
@@ -234,11 +262,11 @@ export default function TechnicianDashboardPage() {
                   </p>
                 </div>
                 <div className="bg-white/50 rounded-lg p-4 col-span-2 md:col-span-1">
-                  <p className="text-xs text-muted-foreground font-medium mb-1">Plan Features</p>
+                  <p className="text-xs text-muted-foreground font-medium mb-1">Jobs Capacity</p>
                   <p className="text-sm font-semibold text-foreground">
-                    {currentPlan.planDetails?.features?.length || 0} features
+                    Can accept ~{jobCapacity} more jobs
                   </p>
-                  <p className="text-xs text-muted-foreground mt-1">+ Premium support</p>
+                  <p className="text-xs text-muted-foreground mt-1">2 credits per job</p>
                 </div>
               </div>
             </div>
@@ -284,16 +312,15 @@ export default function TechnicianDashboardPage() {
                       <>
                         <Button
                           onClick={() => handleAccept(request.id)}
-                          disabled={currentPlan && currentPlan.credits === 0}
-                          className={`${
-                            currentPlan && currentPlan.credits === 0
-                              ? "bg-gray-400 cursor-not-allowed text-white"
-                              : "bg-green-600 hover:bg-green-700 text-white"
-                          }`}
-                          title={currentPlan && currentPlan.credits === 0 ? "No credits available. Upgrade your plan." : "Accept job request"}
+                          disabled={currentPlan && typeof currentPlan.credits === "number" && currentPlan.credits < 2}
+                          className={`${currentPlan && typeof currentPlan.credits === "number" && currentPlan.credits < 2
+                            ? "bg-gray-400 cursor-not-allowed text-white"
+                            : "bg-green-600 hover:bg-green-700 text-white"
+                            }`}
+                          title={currentPlan && typeof currentPlan.credits === "number" && currentPlan.credits < 2 ? "Insufficient credits (needs 2)" : "Accept job request"}
                         >
                           <Check className="w-4 h-4 mr-1" />
-                          Accept
+                          Accept (2 Credits)
                         </Button>
                         <Button
                           variant="outline"
@@ -305,13 +332,22 @@ export default function TechnicianDashboardPage() {
                         </Button>
                       </>
                     ) : (
-                      <span
-                        className={`px-4 py-2 rounded-lg text-sm font-medium ${
-                          request.status === "confirmed" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
-                        }`}
-                      >
-                        {request.status === "confirmed" ? "Accepted" : "Rejected"}
-                      </span>
+                      <div className="flex flex-col items-end gap-1">
+                        <span
+                          className={`px-4 py-2 rounded-lg text-sm font-medium ${request.status === "confirmed" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
+                            }`}
+                        >
+                          {request.status === "confirmed" ? "Accepted" : "Rejected/Cancelled"}
+                        </span>
+                        {request.status === "confirmed" && (
+                          <button
+                            onClick={() => handleSimulateCancel(request.id)}
+                            className="text-xs text-blue-600 hover:underline"
+                          >
+                            Simulate Cancel (Refund)
+                          </button>
+                        )}
+                      </div>
                     )}
                   </div>
                 </div>
@@ -319,25 +355,13 @@ export default function TechnicianDashboardPage() {
             </div>
           </div>
 
-          {/* Earnings Chart */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="bg-card rounded-2xl shadow-sm p-6">
-              <h3 className="text-lg font-semibold text-foreground mb-4">Monthly Earnings</h3>
-              <div className="h-48 flex items-end justify-between gap-2">
-                {[15000, 22000, 18000, 28000, 24000, 30000].map((value, index) => (
-                  <div key={index} className="flex-1 flex flex-col items-center gap-2">
-                    <div
-                      className="w-full bg-green-500/20 rounded-t-lg transition-all hover:bg-green-500/40"
-                      style={{ height: `${(value / 30000) * 100}%` }}
-                    />
-                    <span className="text-xs text-muted-foreground">
-                      {["Aug", "Sep", "Oct", "Nov", "Dec", "Jan"][index]}
-                    </span>
-                  </div>
-                ))}
-              </div>
+            {/* Credit History */}
+            <div>
+              <CreditHistory />
             </div>
 
+            {/* Job Types */}
             <div className="bg-card rounded-2xl shadow-sm p-6">
               <h3 className="text-lg font-semibold text-foreground mb-4">Job Types</h3>
               <div className="space-y-4">
