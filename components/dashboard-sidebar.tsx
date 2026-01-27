@@ -6,6 +6,7 @@ import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { Wrench, Home, LogOut, LayoutDashboard, Users, CheckSquare, MessageSquare, Wallet, User, Calendar, MapPin, CreditCard, Briefcase, X } from "lucide-react"
 import { useSidebar } from "./sidebar-context"
+import { useToast } from "@/hooks/use-toast"
 
 interface SidebarLink {
   name: string
@@ -55,9 +56,16 @@ export function DashboardSidebar({ type }: DashboardSidebarProps) {
   const pathname = usePathname()
   const router = useRouter()
   const { isMobileOpen, setIsMobileOpen } = useSidebar()
+  const { toast } = useToast()
 
   const handleSignOut = () => {
     localStorage.clear()
+    toast({
+      title: "Signed Out",
+      description: "You have successfully signed out.",
+      variant: "default",
+      className: "bg-blue-50 border-blue-200 text-blue-900"
+    })
     router.push("/auth/signin")
   }
 
@@ -133,9 +141,8 @@ export function DashboardSidebar({ type }: DashboardSidebarProps) {
               key={link.href}
               href={link.href}
               onClick={handleLinkClick}
-              className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${
-                isActive ? "bg-primary text-primary-foreground" : "text-gray-400 hover:bg-white/5 hover:text-white"
-              }`}
+              className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${isActive ? "bg-primary text-primary-foreground" : "text-gray-400 hover:bg-white/5 hover:text-white"
+                }`}
             >
               <link.icon className="w-5 h-5 flex-shrink-0" />
               <span className="font-medium">{link.name}</span>
@@ -154,7 +161,7 @@ export function DashboardSidebar({ type }: DashboardSidebarProps) {
           <Home className="w-5 h-5" />
           <span className="font-medium">Back to Home</span>
         </Link>
-        <button 
+        <button
           onClick={() => {
             handleSignOut()
             handleLinkClick()
@@ -186,9 +193,8 @@ export function DashboardSidebar({ type }: DashboardSidebarProps) {
 
       {/* Mobile Sidebar Drawer */}
       <aside
-        className={`fixed left-0 top-0 bottom-0 w-64 bg-secondary border-r border-border flex-col z-50 lg:hidden transform transition-transform duration-300 ease-in-out ${
-          isMobileOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
+        className={`fixed left-0 top-0 bottom-0 w-64 bg-secondary border-r border-border flex-col z-50 lg:hidden transform transition-transform duration-300 ease-in-out ${isMobileOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
         aria-label="Navigation sidebar"
       >
         <SidebarContent />

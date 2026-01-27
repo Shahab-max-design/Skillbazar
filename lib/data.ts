@@ -55,7 +55,7 @@ export interface SubscriptionPlan {
 export interface TechnicianSubscription {
   technicianId: string
   plan: "free" | "basic" | "standard" | "premium"
-  credits: number
+  credits: number | "unlimited"
   activationDate: string
   renewalDate?: string
 }
@@ -227,6 +227,7 @@ export const technicians: Technician[] = [
     phone: "+92 303 4567890",
     whatsapp: "+92 303 4567890",
     image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face",
+    type: "onsite",
   },
   {
     id: "el-5",
@@ -262,6 +263,7 @@ export const technicians: Technician[] = [
     phone: "+92 334 5678901",
     whatsapp: "+92 334 5678901",
     image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face",
+    type: "onsite",
   },
   {
     id: "el-7",
@@ -279,6 +281,7 @@ export const technicians: Technician[] = [
     phone: "+92 335 6789012",
     whatsapp: "+92 335 6789012",
     image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face",
+    type: "onsite",
   },
 
   // ============ PLUMBERS ============

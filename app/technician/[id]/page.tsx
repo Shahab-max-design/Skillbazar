@@ -5,6 +5,7 @@ import Link from "next/link"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
 import { BookingModal } from "@/components/booking-modal"
+import { JobRequestModal } from "@/components/job-request-modal"
 import { technicians } from "@/lib/data"
 import { useRecentProfessionals } from "@/hooks/use-recent-professionals"
 import {
@@ -110,6 +111,9 @@ export default function TechnicianProfilePage({ params }: { params: Promise<{ id
                     <Shield className="w-3 h-3 inline mr-1" />
                     Verified
                   </span>
+                  <span className={`px-3 py-1 rounded-full text-sm font-medium ${technician.type === "onsite" ? "bg-blue-100 text-blue-800" : "bg-purple-100 text-purple-800"}`}>
+                    {technician.type === "onsite" ? "Onsite Service" : "Digital Service"}
+                  </span>
                 </div>
 
                 <p className="text-xl text-primary font-semibold mb-3">{technician.skill}</p>
@@ -132,11 +136,13 @@ export default function TechnicianProfilePage({ params }: { params: Promise<{ id
                 </div>
               </div>
 
-              {/* Price */}
-              <div className="text-right">
-                <div className="text-3xl font-bold text-foreground">Rs. {technician.rate.toLocaleString()}</div>
-                <div className="text-sm text-muted-foreground">per visit</div>
-              </div>
+              {/* Price - ONSITE HIDDEN, DIGITAL VISIBLE */}
+              {technician.type === "digital" && (
+                <div className="text-right">
+                  <div className="text-3xl font-bold text-foreground">Rs. {technician.rate.toLocaleString()}</div>
+                  <div className="text-sm text-muted-foreground">per visit</div>
+                </div>
+              )}
             </div>
           </div>
 
@@ -177,38 +183,51 @@ export default function TechnicianProfilePage({ params }: { params: Promise<{ id
 
           {/* Action Buttons */}
           <div className="p-6 sm:p-8 bg-muted border-t border-border">
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Button
-                onClick={() => setIsBookingOpen(true)}
-                className="flex-1 bg-primary hover:bg-primary/90 py-6 text-lg"
-              >
-                Book Now
-              </Button>
-              <a href={`tel:${technician.phone}`} className="flex-1">
-                <Button variant="outline" className="w-full py-6 text-lg bg-transparent">
-                  <Phone className="w-5 h-5 mr-2" />
-                  Call
-                </Button>
-              </a>
-              <a
-                href={`https://wa.me/${technician.whatsapp.replace(/[^0-9]/g, "")}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex-1"
-              >
+            {technician.type === "onsite" ? (
+              // ONSITE ACTION: Send Job Request Only
+              <div className="flex flex-col sm:flex-row gap-4">
                 <Button
-                  variant="outline"
-                  className="w-full py-6 text-lg text-green-600 border-green-600 hover:bg-green-50 bg-transparent"
+                  onClick={() => setIsBookingOpen(true)}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white py-6 text-lg font-bold shadow-lg transform hover:scale-[1.02] transition-all"
                 >
-                  <MessageCircle className="w-5 h-5 mr-2" />
-                  WhatsApp
+                  Send Job Request
                 </Button>
-              </a>
-            </div>
+              </div>
+            ) : (
+              // DIGITAL ACTION: Book, Call, WhatsApp
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Button
+                  onClick={() => setIsBookingOpen(true)}
+                  className="flex-1 bg-primary hover:bg-primary/90 py-6 text-lg"
+                >
+                  Book Now
+                </Button>
+                <a href={`tel:${technician.phone}`} className="flex-1">
+                  <Button variant="outline" className="w-full py-6 text-lg bg-transparent">
+                    <Phone className="w-5 h-5 mr-2" />
+                    Call
+                  </Button>
+                </a>
+                <a
+                  href={`https://wa.me/${technician.whatsapp.replace(/[^0-9]/g, "")}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1"
+                >
+                  <Button
+                    variant="outline"
+                    className="w-full py-6 text-lg text-green-600 border-green-600 hover:bg-green-50 bg-transparent"
+                  >
+                    <MessageCircle className="w-5 h-5 mr-2" />
+                    WhatsApp
+                  </Button>
+                </a>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Reviews Section (Fake) */}
+        {/* Reviews Section - Kept same */}
         <div className="bg-card rounded-2xl shadow-xl mt-6 p-6 sm:p-8 animate-fade-in-up animation-delay-200">
           <h2 className="text-xl font-bold text-foreground mb-6">Recent Reviews</h2>
           <div className="space-y-6">
@@ -258,8 +277,20 @@ export default function TechnicianProfilePage({ params }: { params: Promise<{ id
 
       <Footer />
 
-      {/* Booking Modal */}
-      <BookingModal technician={technician} isOpen={isBookingOpen} onClose={() => setIsBookingOpen(false)} />
+      {/* Conditionally render Modal based on Type */}
+      {technician.type === "onsite" ? (
+        <JobRequestModal
+          technician={technician}
+          isOpen={isBookingOpen}
+          onClose={() => setIsBookingOpen(false)}
+        />
+      ) : (
+        <BookingModal
+          technician={technician}
+          isOpen={isBookingOpen}
+          onClose={() => setIsBookingOpen(false)}
+        />
+      )}
     </main>
   )
 }

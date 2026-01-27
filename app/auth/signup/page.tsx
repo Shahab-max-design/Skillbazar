@@ -320,8 +320,8 @@ export default function SignUpPage() {
                         type="button"
                         onClick={() => toggleService(service, "onsite")}
                         className={`p-3 rounded-lg border-2 transition-all text-sm font-medium flex items-center gap-2 ${formData.onsiteServices.includes(service)
-                            ? "border-primary bg-primary/10 text-primary"
-                            : "border-border text-muted-foreground hover:border-primary"
+                          ? "border-primary bg-primary/10 text-primary"
+                          : "border-border text-muted-foreground hover:border-primary"
                           }`}
                       >
                         {formData.onsiteServices.includes(service) && (
@@ -349,8 +349,8 @@ export default function SignUpPage() {
                         type="button"
                         onClick={() => toggleService(skill, "digital")}
                         className={`p-3 rounded-lg border-2 transition-all text-sm font-medium flex items-center gap-2 ${formData.digitalSkills.includes(skill)
-                            ? "border-primary bg-primary/10 text-primary"
-                            : "border-border text-muted-foreground hover:border-primary"
+                          ? "border-primary bg-primary/10 text-primary"
+                          : "border-border text-muted-foreground hover:border-primary"
                           }`}
                       >
                         {formData.digitalSkills.includes(skill) && (
@@ -372,7 +372,7 @@ export default function SignUpPage() {
                     id="portfolioLink"
                     name="portfolioLink"
                     type="url"
-                    placeholder="https://your-portfolio.com"
+                    placeholder="Enter URL (e.g., https://your-portfolio.com)"
                     value={formData.portfolioLink}
                     onChange={handleInputChange}
                     className="rounded-xl border-border focus-visible:ring-primary"
@@ -389,7 +389,7 @@ export default function SignUpPage() {
                     id="hourlyRate"
                     name="hourlyRate"
                     type="number"
-                    placeholder="1000"
+                    placeholder="Enter your hourly rate"
                     value={formData.hourlyRate}
                     onChange={handleInputChange}
                     className="rounded-xl border-border focus-visible:ring-primary"
@@ -404,7 +404,7 @@ export default function SignUpPage() {
                   </Label>
                   <Select value={formData.availability} onValueChange={(value) => setFormData((prev) => ({ ...prev, availability: value }))}>
                     <SelectTrigger id="availability" className="w-full rounded-xl border-border">
-                      <SelectValue placeholder="Select availability" />
+                      <SelectValue placeholder="Select your availability" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="Full-time">Full-time</SelectItem>
@@ -440,7 +440,7 @@ export default function SignUpPage() {
                 id="email"
                 name="email"
                 type="email"
-                placeholder="you@example.com"
+                placeholder="Enter your email address"
                 value={formData.email}
                 onChange={handleInputChange}
                 className="rounded-xl border-border focus-visible:ring-primary"
@@ -455,7 +455,7 @@ export default function SignUpPage() {
               <Input
                 id="phone"
                 name="phone"
-                placeholder="+92 300 1234567"
+                placeholder="Enter your phone number (e.g., +92 300 1234567)"
                 value={formData.phone}
                 onChange={handleInputChange}
                 className="rounded-xl border-border focus-visible:ring-primary"

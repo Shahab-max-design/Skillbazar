@@ -9,9 +9,12 @@ import { Label } from "@/components/ui/label"
 import { useUser } from "@/hooks/use-user"
 import { Wrench, ArrowLeft } from "lucide-react"
 
+import { useToast } from "@/hooks/use-toast"
+
 export default function SignInPage() {
   const router = useRouter()
   const { loginUser } = useUser()
+  const { toast } = useToast()
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -50,11 +53,18 @@ export default function SignInPage() {
       if (success) {
         // Get user data from localStorage
         const user = JSON.parse(localStorage.getItem("skillbazaar_user") || "{}")
-        console.log("User logged in:", user);
-        
+
+        // Success Toast
+        toast({
+          title: "Welcome back!",
+          description: `Successfully signed in as ${user.name || "User"}.`,
+          variant: "default", // or "success" if configured
+          className: "bg-green-50 border-green-200 text-green-900"
+        })
+
         // Determine the correct role based on user data
         let userRole: "digital_provider" | "technician" | "customer" | null = null;
-        
+
         // Handle both new and legacy role formats
         if (user.role === "digital_provider" || (user.role === "service-provider" && user.serviceType === "digital")) {
           userRole = "digital_provider";
@@ -63,18 +73,23 @@ export default function SignInPage() {
         } else if (user.role === "customer") {
           userRole = "customer";
         }
-        
-        console.log("Extracted role:", userRole);
-        
+
         // Save the role using standardized key
         if (userRole) {
           localStorage.setItem("userRole", userRole);
-          console.log("Role saved to userRole:", userRole);
         }
-        
-        // Success - redirect to dashboard entry point
-        console.log("Redirecting to dashboard...");
-        window.location.href = "/dashboard";
+
+        // Success - redirect based on role and subscription status
+        setTimeout(() => {
+          if (userRole === "technician") {
+            const hasSubscription = localStorage.getItem("technicianSubscription")
+            if (!hasSubscription) {
+              window.location.href = "/dashboard/technician/subscription"
+              return
+            }
+          }
+          window.location.href = "/dashboard"
+        }, 1000) // Small delay to let toast show
       } else {
         console.log("Login failed - invalid credentials");
         setErrors({ email: "Invalid email or password" })
@@ -114,7 +129,7 @@ export default function SignInPage() {
               id="email"
               name="email"
               type="email"
-              placeholder="you@example.com"
+              placeholder="Enter your email address"
               value={formData.email}
               onChange={handleInputChange}
               className="rounded-xl border-border focus-visible:ring-primary"

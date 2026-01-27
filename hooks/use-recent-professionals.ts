@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 
 export interface RecentProfessional {
   id: string
@@ -9,7 +9,7 @@ export interface RecentProfessional {
   image: string
   rating: number
   reviews: number
-  type: "digital" | "onsite"
+  type?: "digital" | "onsite"
   viewedAt: number
 }
 
@@ -28,36 +28,47 @@ export function useRecentProfessionals() {
       }
     } catch (error) {
       console.error("Failed to load recent professionals:", error)
+      // Fallback or clear if corrupted
+      localStorage.removeItem(STORAGE_KEY)
     } finally {
       setIsLoading(false)
     }
   }, [])
 
-  const addProfessional = (professional: Omit<RecentProfessional, "viewedAt">) => {
+  // Use useCallback to ensure stable reference
+  const addProfessional = useCallback((professional: Omit<RecentProfessional, "viewedAt">) => {
     setProfessionals((prev) => {
-      // Remove if already exists
+      // Remove if already exists to avoid duplicates
       const filtered = prev.filter((p) => p.id !== professional.id)
+
       // Add new at the beginning with current timestamp
       const updated = [{ ...professional, viewedAt: Date.now() }, ...filtered].slice(0, 12) // Keep last 12
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated))
+
+      // Save to localStorage
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(updated))
+      } catch (e) {
+        console.error("Failed to save to localStorage", e)
+      }
+
       return updated
     })
-  }
+  }, [])
 
-  const removeProfessional = (id: string) => {
+  const removeProfessional = useCallback((id: string) => {
     setProfessionals((prev) => {
       const updated = prev.filter((p) => p.id !== id)
       localStorage.setItem(STORAGE_KEY, JSON.stringify(updated))
       return updated
     })
-  }
+  }, [])
 
-  const clearAll = () => {
+  const clearAll = useCallback(() => {
     setProfessionals([])
     localStorage.removeItem(STORAGE_KEY)
-  }
+  }, [])
 
-  // Sort by most recently viewed
+  // Sort by most recently viewed (derived state, cheap to compute)
   const sorted = [...professionals].sort((a, b) => b.viewedAt - a.viewedAt)
 
   return {

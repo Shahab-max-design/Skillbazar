@@ -10,10 +10,10 @@ interface TechnicianCardProps {
 
 export function TechnicianCard({ technician }: TechnicianCardProps) {
   return (
-    <Link href={`/technician/${technician.id}`} className="block group">
-      <div className="bg-card rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 transform group-hover:-translate-y-1">
-        {/* Image Section */}
-        <div className="relative h-48 overflow-hidden">
+    <div className="block group h-full">
+      <div className="bg-card rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 transform group-hover:-translate-y-1 h-full flex flex-col">
+        {/* Image Section - Link wrapper only for image */}
+        <Link href={`/technician/${technician.id}`} className="relative h-48 overflow-hidden block">
           <img
             src={technician.image || "/placeholder.svg"}
             alt={technician.name}
@@ -45,21 +45,26 @@ export function TechnicianCard({ technician }: TechnicianCardProps) {
             <span className="text-white text-sm font-medium">{technician.rating}</span>
             <span className="text-gray-300 text-xs">({technician.reviews})</span>
           </div>
-        </div>
+        </Link>
 
         {/* Content */}
-        <div className="p-5">
+        <div className="p-5 flex flex-col flex-grow">
           <div className="flex items-start justify-between mb-3">
             <div>
-              <h3 className="text-lg font-semibold text-foreground group-hover:text-primary transition-colors">
-                {technician.name}
-              </h3>
+              <Link href={`/technician/${technician.id}`}>
+                <h3 className="text-lg font-semibold text-foreground group-hover:text-primary transition-colors">
+                  {technician.name}
+                </h3>
+              </Link>
               <p className="text-primary font-medium">{technician.skill}</p>
             </div>
-            <div className="text-right">
-              <div className="text-lg font-bold text-foreground">Rs. {technician.rate.toLocaleString()}</div>
-              <div className="text-xs text-muted-foreground">{technician.type === "digital" ? "per hour/project" : "per visit"}</div>
-            </div>
+            {/* Price - ONLY illustrate for Digital */}
+            {technician.type === "digital" && (
+              <div className="text-right">
+                <div className="text-lg font-bold text-foreground">Rs. {technician.rate.toLocaleString()}</div>
+                <div className="text-xs text-muted-foreground">per hour/project</div>
+              </div>
+            )}
           </div>
 
           {/* Areas / Remote Badge */}
@@ -81,14 +86,25 @@ export function TechnicianCard({ technician }: TechnicianCardProps) {
           </div>
 
           {/* Experience */}
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
             <Clock className="w-4 h-4 text-primary" />
             <span>{technician.experience} experience</span>
             <span className="text-xs">•</span>
             <span>{technician.completedJobs} jobs completed</span>
           </div>
+
+          {/* Action Button - ONSITE ONLY */}
+          {technician.type === "onsite" && (
+            <div className="mt-auto pt-2">
+              <Link href={`/technician/${technician.id}?request=open`} className="w-full block">
+                <button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-medium transition-colors">
+                  Send Job Request
+                </button>
+              </Link>
+            </div>
+          )}
         </div>
       </div>
-    </Link>
+    </div>
   )
 }

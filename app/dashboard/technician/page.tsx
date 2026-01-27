@@ -32,113 +32,171 @@ function useRoleGuard(router: ReturnType<typeof useRouter>) {
 export default function TechnicianDashboardPage() {
   const router = useRouter()
   useRoleGuard(router)
-  const [requests, setRequests] = useState(technicianBookingRequests)
-  const [creditMessage, setCreditMessage] = useState<string | null>(null)
-  const [currentPlan, setCurrentPlan] = useState<any>(null)
-  const stats = dashboardStats.technician
   const { user, updateUser } = useUser()
   const { toast } = useToast()
 
-  // Polling for credit updates (simple way to keep UI in sync)
-  const [refreshTrigger, setRefreshTrigger] = useState(0)
-
-  // Check subscription on mount
-  useEffect(() => {
-    const isOnsite = isOnsiteTechnician()
-    if (isOnsite) {
-      const subscription = getSubscriptionFromStorage()
-      if (!subscription) {
-        // Redirect to subscription selection if no plan exists
-        router.push("/dashboard/technician/subscription")
-      } else {
-        // Get the plan details
-        const plan = subscriptionPlans.find(p => p.id === subscription.plan)
-        setCurrentPlan({ ...subscription, planDetails: plan })
-      }
-    }
-  }, [router, refreshTrigger])
-
-  // Use user data if logged in, otherwise use defaults
+  // Safe variables for Header
   const displayName = user?.name || "Technician"
-  const displaySkill = user?.onsiteServices?.[0] || (user?.digitalSkills?.[0] || "Service Provider")
+  const displaySkill = user?.role === "technician" && user?.serviceType === "onsite"
+    ? "Onsite Technician"
+    : (user?.role || "Skill not defined")
+  // Merge mock data with local storage data for demo purposes
+  const [requests, setRequests] = useState<any[]>([])
+  const [currentPlan, setCurrentPlan] = useState<any>(null)
+  const [creditMessage, setCreditMessage] = useState<string | null>(null)
+  const stats = dashboardStats.technician
 
-  const handleAccept = (id: string) => {
+  // Load requests and subscription
+  useEffect(() => {
+    const loadData = () => {
+      // Load requests
+      const stored = localStorage.getItem("technicianRequests")
+      const localRequests = stored ? JSON.parse(stored) : []
+      setRequests([...technicianBookingRequests, ...localRequests])
+
+      // Load subscription
+      const sub = getSubscriptionFromStorage()
+      setCurrentPlan(sub)
+    }
+
+    loadData()
+
+    // Listen for events
+    window.addEventListener("new-job-request", loadData)
+    window.addEventListener("credits-updated", loadData)
+
+    return () => {
+      window.removeEventListener("new-job-request", loadData)
+      window.removeEventListener("credits-updated", loadData)
+    }
+  }, [])
+
+  const handleAccept = (id: string, serviceType: string = "digital") => {
     if (!user) return
 
-    // Get current subscription
-    const subscription = getSubscriptionFromStorage()
-
-    // Only deduct credits for onsite technicians with active subscription
-    if (isOnsiteTechnician() && subscription) {
-      const currentCredits = typeof subscription.credits === "number" ? subscription.credits : 999999
-
-      // Deduct credits logic
-      if (canAcceptJob(subscription.credits)) {
-        const result = deductCreditsForJob(id, currentCredits)
-
-        if (result.success) {
-          // Update subscription storage
-          subscription.credits = result.newBalance
-          localStorage.setItem("technicianSubscription", JSON.stringify(subscription))
-
-          // Update user context
-          updateUser({ credits: result.newBalance })
-
-          // Show message
-          setCreditMessage(`2 credits deducted. ${result.newBalance} credits remaining.`)
-
-          // Update local state to trigger re-render
-          setRefreshTrigger(prev => prev + 1)
-
-          // Update request status
-          setRequests((prev) => prev.map((req) => (req.id === id ? { ...req, status: "confirmed" as const } : req)))
-
-          // Dispatch event for history component
-          window.dispatchEvent(new Event("credits-updated"))
-        } else {
-          setCreditMessage(result.error || "Failed to accept job.")
-        }
-      } else {
-        setCreditMessage("Insufficient credits. Upgrade your plan to accept more jobs.")
+    // ONSITE LOGIC
+    if (isOnsiteTechnician() || serviceType === "onsite") {
+      // 1. Check Subscription & Credits
+      const sub = getSubscriptionFromStorage()
+      if (!sub) {
+        toast({ title: "Error", description: "No active subscription found.", variant: "destructive" })
+        return
       }
 
-    } else if (!isOnsiteTechnician()) {
-      // Digital provider - no credit deduction
-      updateUser({ credits: (user.credits || 0) })
-      setRequests((prev) => prev.map((req) => (req.id === id ? { ...req, status: "confirmed" as const } : req)))
+      // 2. Validate Credits
+      if (!canAcceptJob(sub.credits)) {
+        toast({
+          title: "Insufficient Credits",
+          description: `You need ${getJobCost()} credits to accept this job. Please upgrade your plan.`,
+          variant: "destructive"
+        })
+        return
+      }
+
+      // 3. Deduct Credits
+      const currentCredits = sub.credits === "unlimited" ? 99999 : sub.credits
+      const result = deductCreditsForJob(id, currentCredits)
+
+      if (!result.success) {
+        toast({ title: "Error", description: result.error, variant: "destructive" })
+        return
+      }
+
+      // 4. Update Subscription Storage
+      if (sub.credits !== "unlimited") {
+        sub.credits = result.newBalance
+        localStorage.setItem("technicianSubscription", JSON.stringify(sub))
+        // Update local state
+        setCurrentPlan({ ...sub })
+        updateUser({ credits: sub.credits })
+        window.dispatchEvent(new Event("credits-updated"))
+      }
+
+      // 5. Update Request Status
+      const updatedRequests = requests.map(req =>
+        req.id === id ? { ...req, status: "accepted" } : req
+      )
+      setRequests(updatedRequests)
+
+      // Update localStorage if it's a local request
+      const stored = localStorage.getItem("technicianRequests")
+      if (stored) {
+        const localReqs = JSON.parse(stored)
+        const newLocalReqs = localReqs.map((r: any) => r.id === id ? { ...r, status: "accepted" } : r)
+        localStorage.setItem("technicianRequests", JSON.stringify(newLocalReqs))
+      }
+
+      // 6. Show Success Message
+      toast({
+        title: "Job Accepted",
+        description: "2 credits have been deducted from your plan for this job request.",
+        className: "bg-green-50 border-green-200 text-green-800"
+      })
+
+    } else {
+      // DIGITAL LOGIC (Keep existing or simple confirm)
+      setRequests((prev) => prev.map((req) => (req.id === id ? { ...req, status: "confirmed" } : req)))
       setCreditMessage("Job accepted! ✓")
     }
+  }
 
-    // Auto-dismiss message
-    setTimeout(() => setCreditMessage(null), 3500)
+  const handleUnlockContact = (id: string) => {
+    // Check credits
+    const subscription = getSubscriptionFromStorage()
+    const currentCredits = subscription?.credits || 0
+
+    if (typeof currentCredits === "number" && currentCredits < 2) {
+      setCreditMessage("Insufficient credits to unlock contact (Needs 2).")
+      return
+    }
+
+    // Deduct credits
+    if (subscription && typeof subscription.credits === "number") {
+      subscription.credits -= 2
+      localStorage.setItem("technicianSubscription", JSON.stringify(subscription))
+      // Update local state immediately to reflect change
+      setCurrentPlan({ ...subscription })
+      updateUser({ credits: subscription.credits })
+      window.dispatchEvent(new Event("credits-updated"))
+    }
+
+    // Update request state to 'contact_unlocked' (custom flag)
+    const updatedRequests = requests.map(req =>
+      req.id === id ? { ...req, contactUnlocked: true } : req
+    )
+    setRequests(updatedRequests)
+
+    // Update localStorage
+    const stored = localStorage.getItem("technicianRequests")
+    if (stored) {
+      const localReqs = JSON.parse(stored)
+      const newLocalReqs = localReqs.map((r: any) => r.id === id ? { ...r, contactUnlocked: true } : r)
+      localStorage.setItem("technicianRequests", JSON.stringify(newLocalReqs))
+    }
+
+    setCreditMessage("Contact Unlocked! -2 Credits")
+    setTimeout(() => setCreditMessage(null), 3000)
   }
 
   const handleReject = (id: string) => {
-    // Rejection does not deduct credits
-    setRequests((prev) => prev.map((req) => (req.id === id ? { ...req, status: "cancelled" as const } : req)))
+    const updatedRequests = requests.map(req =>
+      req.id === id ? { ...req, status: "rejected" } : req
+    )
+    setRequests(updatedRequests)
+
+    // Update localStorage
+    const stored = localStorage.getItem("technicianRequests")
+    if (stored) {
+      const localReqs = JSON.parse(stored)
+      const newLocalReqs = localReqs.map((r: any) => r.id === id ? { ...r, status: "rejected" } : r)
+      localStorage.setItem("technicianRequests", JSON.stringify(newLocalReqs))
+    }
   }
 
-  // Temporary function to simulate cancellation/refund
+  // Temporary function to simulate cancellation/refund (Only valid if contact was unlocked? Simplified for now)
   const handleSimulateCancel = (id: string) => {
-    if (!isOnsiteTechnician()) return
-
-    const subscription = getSubscriptionFromStorage()
-    if (subscription && typeof subscription.credits === "number") {
-      const result = refundCreditsForJob(id, subscription.credits)
-
-      if (result.success) {
-        subscription.credits = result.newBalance
-        localStorage.setItem("technicianSubscription", JSON.stringify(subscription))
-        updateUser({ credits: result.newBalance })
-        setRefreshTrigger(prev => prev + 1)
-        setCreditMessage(`2 credits refunded. ${result.newBalance} credits available.`)
-        window.dispatchEvent(new Event("credits-updated"))
-
-        // Reset status for demo
-        setRequests((prev) => prev.map((req) => (req.id === id ? { ...req, status: "cancelled" as const } : req)))
-      }
-    }
-    setTimeout(() => setCreditMessage(null), 3500)
+    // Simplified for demo
+    handleReject(id)
   }
 
   const handleProfileSave = (updatedUser: typeof user) => {
@@ -285,68 +343,99 @@ export default function TechnicianDashboardPage() {
               {requests.map((request) => (
                 <div
                   key={request.id}
-                  className="p-6 hover:bg-muted/30 transition-colors flex flex-col sm:flex-row sm:items-center gap-4"
+                  className="p-6 hover:bg-muted/30 transition-colors flex flex-col sm:flex-row sm:items-start gap-4"
                 >
-                  <div className="flex items-center gap-4 flex-1">
+                  <div className="flex items-start gap-4 flex-1">
                     <img
-                      src={request.technicianImage || "/placeholder.svg"}
+                      src={request.technicianImage || "/placeholder.svg"} // Actually customer image would be better here if available
                       alt={request.technicianName}
                       className="w-14 h-14 rounded-xl object-cover"
                     />
                     <div>
-                      <h3 className="font-semibold text-foreground">{request.technicianName}</h3>
+                      <h3 className="font-semibold text-foreground">{request.customerName || request.technicianName || "Guest User"}</h3>
                       <p className="text-primary font-medium text-sm">{request.service}</p>
-                      <p className="text-muted-foreground text-sm">
-                        {request.date} at {request.time}
-                      </p>
+
+                      {/* ONSITE Details */}
+                      {request.serviceType === "onsite" && (
+                        <div className="mt-1 space-y-1">
+                          <p className="font-medium text-sm text-foreground">{request.title}</p>
+                          <p className="text-xs text-muted-foreground line-clamp-2">{request.description}</p>
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
+                            <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {request.date} {request.time}</span>
+                            <span className="flex items-center gap-1"><Check className="w-3 h-3" /> {request.location}</span>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* DIGITAL Details */}
+                      {request.serviceType !== "onsite" && (
+                        <p className="text-muted-foreground text-sm">
+                          {request.date} at {request.time}
+                        </p>
+                      )}
                     </div>
                   </div>
 
                   <div className="text-right sm:text-left">
-                    <div className="text-lg font-bold text-foreground">Rs. {request.amount.toLocaleString()}</div>
-                    <div className="text-sm text-muted-foreground">Service fee</div>
+                    <div className="text-lg font-bold text-foreground">
+                      {request.amount ? `Rs. ${request.amount.toLocaleString()}` : "Pending Quote"}
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      {request.serviceType === "onsite" ? "Budget" : "Service fee"}
+                    </div>
                   </div>
 
-                  <div className="flex gap-2">
+                  <div className="flex flex-col gap-2 min-w-[140px]">
                     {request.status === "pending" ? (
                       <>
                         <Button
-                          onClick={() => handleAccept(request.id)}
-                          disabled={currentPlan && typeof currentPlan.credits === "number" && currentPlan.credits < 2}
-                          className={`${currentPlan && typeof currentPlan.credits === "number" && currentPlan.credits < 2
-                            ? "bg-gray-400 cursor-not-allowed text-white"
-                            : "bg-green-600 hover:bg-green-700 text-white"
-                            }`}
-                          title={currentPlan && typeof currentPlan.credits === "number" && currentPlan.credits < 2 ? "Insufficient credits (needs 2)" : "Accept job request"}
+                          onClick={() => handleAccept(request.id, request.serviceType)}
+                          className="bg-green-600 hover:bg-green-700 text-white w-full"
                         >
                           <Check className="w-4 h-4 mr-1" />
-                          Accept (2 Credits)
+                          Accept
                         </Button>
                         <Button
                           variant="outline"
                           onClick={() => handleReject(request.id)}
-                          className="text-red-500 border-red-500 hover:bg-red-50 bg-transparent"
+                          className="text-red-500 border-red-500 hover:bg-red-50 bg-transparent w-full"
                         >
                           <X className="w-4 h-4 mr-1" />
                           Reject
                         </Button>
                       </>
+                    ) : request.status === "accepted" && request.serviceType === "onsite" ? (
+                      <div className="space-y-2">
+                        {request.contactUnlocked ? (
+                          <div className="bg-green-50 p-2 rounded border border-green-200 text-center">
+                            <p className="text-xs text-green-700 font-bold">Contact Revealed:</p>
+                            <p className="text-sm font-mono text-green-800">0300-1234567</p>
+                            <Button variant="outline" size="sm" className="w-full mt-1 h-7 text-xs">
+                              Open Chat
+                            </Button>
+                          </div>
+                        ) : (
+                          <div className="bg-amber-50 p-2 rounded border border-amber-200 text-center">
+                            <p className="text-xs text-amber-700 font-bold mb-1">Contact Masked</p>
+                            <p className="text-sm font-mono text-amber-800 mb-2">03XX-***-**12</p>
+                            <Button
+                              size="sm"
+                              className="w-full h-8 text-xs bg-amber-600 hover:bg-amber-700 text-white"
+                              onClick={() => handleUnlockContact(request.id)}
+                            >
+                              Unlock (-2 Credits)
+                            </Button>
+                          </div>
+                        )}
+                      </div>
                     ) : (
                       <div className="flex flex-col items-end gap-1">
                         <span
-                          className={`px-4 py-2 rounded-lg text-sm font-medium ${request.status === "confirmed" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
+                          className={`px-4 py-2 rounded-lg text-sm font-medium w-full text-center ${request.status === "confirmed" || request.status === "accepted" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
                             }`}
                         >
-                          {request.status === "confirmed" ? "Accepted" : "Rejected/Cancelled"}
+                          {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
                         </span>
-                        {request.status === "confirmed" && (
-                          <button
-                            onClick={() => handleSimulateCancel(request.id)}
-                            className="text-xs text-blue-600 hover:underline"
-                          >
-                            Simulate Cancel (Refund)
-                          </button>
-                        )}
                       </div>
                     )}
                   </div>
