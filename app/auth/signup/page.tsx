@@ -85,6 +85,16 @@ export default function SignUpPage() {
     setErrors((prev) => ({ ...prev, [name]: "" }))
   }
 
+  const getPasswordRequirements = (password: string) => {
+    return [
+      { id: 'length', label: "At least 8 characters", met: password.length >= 8 },
+      { id: 'upper', label: "One uppercase letter", met: /[A-Z]/.test(password) },
+      { id: 'lower', label: "One lowercase letter", met: /[a-z]/.test(password) },
+      { id: 'number', label: "One number", met: /[0-9]/.test(password) },
+      { id: 'special', label: "One special character (@$!%*?&)", met: /[@$!%*?&]/.test(password) },
+    ]
+  }
+
   const toggleService = (service: string, type: "onsite" | "digital") => {
     if (type === "onsite") {
       setFormData((prev) => ({
@@ -111,7 +121,18 @@ export default function SignUpPage() {
     if (!formData.name.trim()) newErrors.name = "Name is required"
     if (!formData.email.trim()) newErrors.email = "Email is required"
     if (!formData.phone.trim()) newErrors.phone = "Phone is required"
-    if (!formData.password) newErrors.password = "Password is required"
+
+    // Password validation
+    if (!formData.password) {
+      newErrors.password = "Password is required"
+    } else {
+      const requirements = getPasswordRequirements(formData.password)
+      const unmet = requirements.filter(r => !r.met)
+      if (unmet.length > 0) {
+        newErrors.password = "Password does not meet all security requirements"
+      }
+    }
+
     if (formData.password !== formData.confirmPassword)
       newErrors.confirmPassword = "Passwords do not match"
 
@@ -464,7 +485,7 @@ export default function SignUpPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-sm font-medium">
+              <Label htmlFor="password" title="password-label" className="text-sm font-medium">
                 Password
               </Label>
               <Input
@@ -474,13 +495,30 @@ export default function SignUpPage() {
                 placeholder="Enter a strong password"
                 value={formData.password}
                 onChange={handleInputChange}
-                className="rounded-xl border-border focus-visible:ring-primary"
+                className={`rounded-xl border-border focus-visible:ring-primary ${errors.password ? 'border-red-500' : ''}`}
               />
-              {errors.password && <p className="text-sm text-red-500">{errors.password}</p>}
+              {/* Password Requirements UI */}
+              <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1.5 p-3 bg-muted/30 rounded-lg border border-border/50">
+                {getPasswordRequirements(formData.password).map((req) => (
+                  <div key={req.id} className="flex items-center gap-2">
+                    <div className={`flex-shrink-0 w-4 h-4 rounded-full flex items-center justify-center transition-colors duration-200 ${req.met ? "bg-green-500" : "bg-muted-foreground/20"}`}>
+                      {req.met ? (
+                        <Check className="w-2.5 h-2.5 text-white" />
+                      ) : (
+                        <div className="w-1 h-1 bg-white rounded-full" />
+                      )}
+                    </div>
+                    <span className={`text-[11px] font-medium transition-colors duration-200 ${req.met ? "text-green-600" : "text-muted-foreground"}`}>
+                      {req.label}
+                    </span>
+                  </div>
+                ))}
+              </div>
+              {errors.password && <p className="text-xs text-red-500 font-medium mt-1">{errors.password}</p>}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword" className="text-sm font-medium">
+              <Label htmlFor="confirmPassword" title="confirm-password-label" className="text-sm font-medium">
                 Confirm Password
               </Label>
               <Input
@@ -490,9 +528,9 @@ export default function SignUpPage() {
                 placeholder="Confirm your password"
                 value={formData.confirmPassword}
                 onChange={handleInputChange}
-                className="rounded-xl border-border focus-visible:ring-primary"
+                className={`rounded-xl border-border focus-visible:ring-primary ${errors.confirmPassword ? 'border-red-500' : ''}`}
               />
-              {errors.confirmPassword && <p className="text-sm text-red-500">{errors.confirmPassword}</p>}
+              {errors.confirmPassword && <p className="text-xs text-red-500 font-medium mt-1">{errors.confirmPassword}</p>}
             </div>
 
             {/* Submit Button */}
