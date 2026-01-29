@@ -6,7 +6,7 @@ import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
 import { TechnicianCard } from "@/components/technician-card"
 import { technicians } from "@/lib/data"
-import { Filter, X, Loader2, ArrowLeft } from "lucide-react"
+import { Search, Filter, X, Loader2, ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 
@@ -30,6 +30,7 @@ function FindServicesContent() {
 
   const [selectedService, setSelectedService] = useState(serviceParam ? getServiceDisplayName(serviceParam) : "")
   const [selectedServiceSlug, setSelectedServiceSlug] = useState(serviceParam || "")
+  const [searchQuery, setSearchQuery] = useState("")
   const [isLoading, setIsLoading] = useState(true)
   const [filteredTechnicians, setFilteredTechnicians] = useState(technicians)
 
@@ -60,12 +61,21 @@ function FindServicesContent() {
         }
       }
 
+      // Search query filter
+      if (searchQuery) {
+        const query = searchQuery.toLowerCase()
+        filtered = filtered.filter((tech) =>
+          tech.skill.toLowerCase().includes(query) ||
+          tech.name.toLowerCase().includes(query)
+        )
+      }
+
       setFilteredTechnicians(filtered)
       setIsLoading(false)
     }, 500)
 
     return () => clearTimeout(timer)
-  }, [selectedServiceSlug])
+  }, [selectedServiceSlug, searchQuery])
 
   const clearFilters = () => {
     setSelectedService("")
@@ -93,32 +103,64 @@ function FindServicesContent() {
             {selectedService ? `${selectedService} Professionals` : "Browse Digital Services"}
           </h1>
           <p className="text-muted-foreground">
-            {selectedServiceSlug 
+            {selectedServiceSlug
               ? `Discover qualified ${selectedService.toLowerCase()} professionals ready to help you.`
               : "Select a service from our digital offerings."}
           </p>
         </div>
 
-        {/* Filter Bar */}
+        {/* Search and Filter Bar */}
         <div className="mb-6 bg-card rounded-lg border p-4 shadow-sm">
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-2">
-              <Filter className="w-5 h-5 text-muted-foreground" />
-              <span className="font-semibold text-foreground">
-                {filteredTechnicians.length} {filteredTechnicians.length === 1 ? "Professional" : "Professionals"} Found
-              </span>
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="relative flex-1 min-w-[300px]">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-primary" />
+              <input
+                type="text"
+                placeholder="Search digital services (e.g. Designer, Writer...)"
+                className="w-full bg-muted hover:bg-muted/80 rounded-xl pl-11 pr-4 py-2.5 text-sm transition-colors focus:ring-2 focus:ring-primary/20 outline-none border border-transparent focus:border-primary/30"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
             </div>
-            {hasFilters && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={clearFilters}
-                className="text-muted-foreground hover:text-foreground"
-              >
-                <X className="w-4 h-4 mr-2" />
-                Clear
-              </Button>
-            )}
+
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <span className="font-semibold text-foreground">
+                  {(() => {
+                    const count = filteredTechnicians.length
+                    let searchTerm = searchQuery.trim() || selectedService || "professional"
+
+                    const getDisplayLabel = (term: string, c: number) => {
+                      const t = term.toLowerCase();
+                      if (c === 1) return t;
+                      if (t.endsWith('s')) return t;
+                      if (t.endsWith('ian')) return t + 's';
+                      if (t.endsWith('er')) return t + 's';
+                      if (t.endsWith('ist')) return t + 's';
+                      if (t.endsWith('y')) return t.slice(0, -1) + 'ies';
+                      return t + 's';
+                    }
+
+                    return (
+                      <span className="animate-fade-in">
+                        {count} {getDisplayLabel(searchTerm, count)} found
+                      </span>
+                    )
+                  })()}
+                </span>
+              </div>
+              {hasFilters && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={clearFilters}
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  <X className="w-4 h-4 mr-2" />
+                  Clear
+                </Button>
+              )}
+            </div>
           </div>
         </div>
 

@@ -220,7 +220,12 @@ export default function TechnicianDashboardPage() {
       <DashboardSidebar type="technician" />
 
       <div className="lg:ml-64">
-        <DashboardHeader title="Overview" userName={displayName} userRole={displaySkill} />
+        <DashboardHeader
+          title="Overview"
+          userName={displayName}
+          userRole={displaySkill}
+          profilePicture={user?.profilePicture}
+        />
 
         <main className="p-4 lg:p-8">
           {/* Edit Profile Button */}

@@ -11,11 +11,11 @@ import { Button } from "@/components/ui/button"
 
 function TechniciansContent() {
   const searchParams = useSearchParams()
-  
+
   // Support both old and new parameter names
   const skillParam = searchParams.get("skill") || ""
   const typeParam = searchParams.get("type") || ""
-  
+
   const [selectedArea, setSelectedArea] = useState(searchParams.get("area") || "All Areas")
   const [selectedService, setSelectedService] = useState(skillParam || searchParams.get("service") || "All Services")
   const [selectedServiceType, setSelectedServiceType] = useState<"onsite" | "digital" | "all">(
@@ -24,6 +24,7 @@ function TechniciansContent() {
   const [areaOpen, setAreaOpen] = useState(false)
   const [serviceOpen, setServiceOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
+  const [searchQuery, setSearchQuery] = useState("")
   const [filteredTechnicians, setFilteredTechnicians] = useState(technicians)
 
   useEffect(() => {
@@ -50,20 +51,31 @@ function TechniciansContent() {
         filtered = filtered.filter((tech) => tech.skill === selectedService)
       }
 
+      // Search query filter
+      if (searchQuery) {
+        const query = searchQuery.toLowerCase()
+        filtered = filtered.filter((tech) =>
+          tech.skill.toLowerCase().includes(query) ||
+          tech.name.toLowerCase().includes(query) ||
+          tech.skills.some(s => s.toLowerCase().includes(query))
+        )
+      }
+
       setFilteredTechnicians(filtered)
       setIsLoading(false)
     }, 500)
 
     return () => clearTimeout(timer)
-  }, [selectedArea, selectedService, selectedServiceType])
+  }, [selectedArea, selectedService, selectedServiceType, searchQuery])
 
   const clearFilters = () => {
     setSelectedArea("All Areas")
     setSelectedService("All Services")
     setSelectedServiceType("all")
+    setSearchQuery("")
   }
 
-  const hasFilters = selectedArea !== "All Areas" || selectedService !== "All Services" || selectedServiceType !== "all"
+  const hasFilters = selectedArea !== "All Areas" || selectedService !== "All Services" || selectedServiceType !== "all" || searchQuery !== ""
 
   return (
     <main className="min-h-screen bg-muted">
@@ -118,6 +130,18 @@ function TechniciansContent() {
       <div className="bg-background sticky top-16 z-30 border-b border-border shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex flex-wrap items-center gap-4">
+            {/* Search Field */}
+            <div className="relative flex-1 min-w-[280px]">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-primary" />
+              <input
+                type="text"
+                placeholder="Search for services (e.g. Electrician, Plumber...)"
+                className="w-full bg-muted hover:bg-muted/80 rounded-xl pl-11 pr-4 py-2.5 text-sm transition-colors focus:ring-2 focus:ring-primary/20 outline-none border border-transparent focus:border-primary/30"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+
             {/* Area Filter - Only show for onsite services or when viewing all (optional, but requested logic says hide for digital) */}
             {selectedServiceType !== "digital" && (
               <div className="relative">
@@ -217,8 +241,40 @@ function TechniciansContent() {
             )}
 
             {/* Results Count */}
-            <div className="ml-auto text-sm text-muted-foreground">
-              {filteredTechnicians.length} technician{filteredTechnicians.length !== 1 ? "s" : ""} found
+            <div className="ml-auto text-sm font-medium text-muted-foreground">
+              {(() => {
+                const count = filteredTechnicians.length
+                let searchTerm = searchQuery.trim()
+
+                if (!searchTerm && selectedService !== "All Services") {
+                  searchTerm = selectedService
+                }
+
+                if (!searchTerm) {
+                  return `${count} technician${count !== 1 ? "s" : ""} found`
+                }
+
+                // Enhanced pluralization logic
+                const getDisplayLabel = (term: string, c: number) => {
+                  const t = term.toLowerCase();
+                  if (c === 1) return t;
+
+                  // Pluralization rules
+                  if (t.endsWith('ian')) return t + 's';
+                  if (t.endsWith('er')) return t + 's';
+                  if (t.endsWith('ist')) return t + 's';
+                  if (t.endsWith('y')) return t.slice(0, -1) + 'ies';
+                  if (t.endsWith('sh') || t.endsWith('ch') || t.endsWith('x')) return t + 'es';
+                  if (t.endsWith('s')) return t;
+                  return t + 's';
+                }
+
+                return (
+                  <span className="animate-fade-in">
+                    {count} <span className="text-primary">{getDisplayLabel(searchTerm, count)}</span> found
+                  </span>
+                )
+              })()}
             </div>
           </div>
         </div>

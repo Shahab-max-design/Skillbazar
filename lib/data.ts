@@ -208,7 +208,7 @@ export const technicians: Technician[] = [
     bio: "Skilled electrician with advanced knowledge of modern electrical systems and automation.",
     phone: "+92 302 3456789",
     whatsapp: "+92 302 3456789",
-    image: "https://images.unsplash.com/photo-1519085360771-9852bada1c3f?w=400&h=400&fit=crop&crop=face",
+    image: "https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=400&h=400&fit=crop&crop=face",
     type: "onsite",
   },
   {
@@ -244,7 +244,7 @@ export const technicians: Technician[] = [
     bio: "Senior electrician with expertise in renewable energy and modern electrical systems.",
     phone: "+92 304 5678901",
     whatsapp: "+92 304 5678901",
-    image: "https://images.unsplash.com/photo-1516321318423-f06f70504c94?w=400&h=400&fit=crop&crop=face",
+    image: "https://images.unsplash.com/photo-1537368910025-700350fe46c7?w=400&h=400&fit=crop&crop=face",
     type: "onsite",
   },
   {
@@ -372,7 +372,7 @@ export const technicians: Technician[] = [
     bio: "Skilled plumber providing reliable and affordable plumbing solutions.",
     phone: "+92 308 9012345",
     whatsapp: "+92 308 9012345",
-    image: "https://images.unsplash.com/photo-1519085360771-9852bada1c3f?w=400&h=400&fit=crop&crop=face",
+    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face",
     type: "onsite",
   },
   {
@@ -482,7 +482,7 @@ export const technicians: Technician[] = [
     bio: "Reliable AC technician providing affordable repair and maintenance services.",
     phone: "+92 311 2345678",
     whatsapp: "+92 311 2345678",
-    image: "https://images.unsplash.com/photo-1514888286974-6c03bf1e7785?w=400&h=400&fit=crop&crop=face",
+    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face",
     type: "onsite",
   },
   {
@@ -500,7 +500,7 @@ export const technicians: Technician[] = [
     bio: "Senior AC technician with vast experience in all types of cooling systems.",
     phone: "+92 312 3456789",
     whatsapp: "+92 312 3456789",
-    image: "https://images.unsplash.com/photo-1539571696357-5a69c006ae5f?w=400&h=400&fit=crop&crop=face",
+    image: "https://images.unsplash.com/photo-1519085360771-9852bada1c3f?w=400&h=400&fit=crop&crop=face",
     type: "onsite",
   },
   {
@@ -592,7 +592,7 @@ export const technicians: Technician[] = [
     bio: "Experienced carpenter offering reliable repair and installation services.",
     phone: "+92 314 5678901",
     whatsapp: "+92 314 5678901",
-    image: "https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=400&h=400&fit=crop&crop=face",
+    image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=400&fit=crop&crop=face",
     type: "onsite",
   },
   {
@@ -610,7 +610,7 @@ export const technicians: Technician[] = [
     bio: "Skilled carpenter providing quality carpentry services at competitive rates.",
     phone: "+92 315 6789012",
     whatsapp: "+92 315 6789012",
-    image: "https://images.unsplash.com/photo-1553224311-bedf415da822?w=400&h=400&fit=crop&crop=face",
+    image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&h=400&fit=crop&crop=face",
     type: "onsite",
   },
   {
@@ -756,7 +756,7 @@ export const technicians: Technician[] = [
     bio: "Skilled painter providing affordable and quality painting services.",
     phone: "+92 319 0123456",
     whatsapp: "+92 319 0123456",
-    image: "https://images.unsplash.com/photo-1540569014015-19a7662176e7?w=400&h=400&fit=crop&crop=face",
+    image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face",
     type: "onsite",
   },
   {
@@ -812,7 +812,7 @@ export const technicians: Technician[] = [
     bio: "Expert in repairing all major home appliances. Quick service with warranty on repairs.",
     phone: "+92 305 6789012",
     whatsapp: "+92 305 6789012",
-    image: "https://images.unsplash.com/photo-1514888286974-6c03bf1e7785?w=400&h=400&fit=crop&crop=face",
+    image: "https://images.unsplash.com/photo-1539571696357-5a69c006ae5f?w=400&h=400&fit=crop&crop=face",
     type: "onsite",
   },
   {
@@ -830,7 +830,7 @@ export const technicians: Technician[] = [
     bio: "Skilled appliance technician offering reliable repair and maintenance services.",
     phone: "+92 321 2345678",
     whatsapp: "+92 321 2345678",
-    image: "https://images.unsplash.com/photo-1514888286974-6c03bf1e7785?w=400&h=400&fit=crop&crop=face",
+    image: "https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=400&h=400&fit=crop&crop=face",
     type: "onsite",
   },
   {
@@ -848,7 +848,7 @@ export const technicians: Technician[] = [
     bio: "Professional appliance repair technician with expertise in all major brands.",
     phone: "+92 322 3456789",
     whatsapp: "+92 322 3456789",
-    image: "https://images.unsplash.com/photo-1546182990-dffeafbe841d?w=400&h=400&fit=crop&crop=face",
+    image: "https://images.unsplash.com/photo-1537368910025-700350fe46c7?w=400&h=400&fit=crop&crop=face",
     type: "onsite",
   },
   {
@@ -940,7 +940,7 @@ export const technicians: Technician[] = [
     bio: "Full-stack web developer specializing in modern responsive web applications. Quick turnaround times.",
     phone: "+92 325 6789012",
     whatsapp: "+92 325 6789012",
-    image: "https://images.unsplash.com/photo-1514888286974-6c03bf1e7785?w=400&h=400&fit=crop&crop=face",
+    image: "https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?w=400&h=400&fit=crop&crop=face",
     type: "digital",
     service: "web-development",
   },

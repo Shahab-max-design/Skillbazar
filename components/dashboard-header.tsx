@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { Menu, Bell, User, Wrench } from "lucide-react"
 import { useSidebar } from "./sidebar-context"
 
@@ -8,17 +9,18 @@ interface DashboardHeaderProps {
   title: string
   userName: string
   userRole: string
+  profilePicture?: string
 }
 
-export function DashboardHeader({ title, userName, userRole }: DashboardHeaderProps) {
+export function DashboardHeader({ title, userName, userRole, profilePicture }: DashboardHeaderProps) {
   const { toggleMobile } = useSidebar()
 
   return (
     <header className="sticky top-0 z-30 bg-background/80 backdrop-blur-md border-b border-border">
       <div className="flex items-center justify-between h-16 px-4 lg:px-8">
         {/* Mobile Menu Toggle - Connected to Sidebar */}
-        <button 
-          className="lg:hidden p-2 -ml-2 rounded-lg hover:bg-muted transition-colors" 
+        <button
+          className="lg:hidden p-2 -ml-2 rounded-lg hover:bg-muted transition-colors"
           onClick={toggleMobile}
           aria-label="Toggle sidebar"
         >
@@ -45,8 +47,17 @@ export function DashboardHeader({ title, userName, userRole }: DashboardHeaderPr
 
           {/* User Info */}
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
-              <User className="w-5 h-5 text-primary" />
+            <div className="w-10 h-10 rounded-full overflow-hidden border border-border bg-primary/10 flex items-center justify-center relative">
+              {profilePicture ? (
+                <Image
+                  src={profilePicture}
+                  alt={userName}
+                  fill
+                  className="object-cover"
+                />
+              ) : (
+                <User className="w-5 h-5 text-primary" />
+              )}
             </div>
             <div className="hidden sm:block">
               <div className="text-sm font-medium text-foreground">{userName}</div>

@@ -34,7 +34,12 @@ export default function CustomerDashboardPage() {
       <DashboardSidebar type="customer" />
 
       <div className="lg:ml-64">
-        <DashboardHeader title="Dashboard" userName={displayName} userRole="Customer" />
+        <DashboardHeader
+          title="Dashboard"
+          userName={displayName}
+          userRole="Customer"
+          profilePicture={user?.profilePicture}
+        />
 
         <main className="p-4 lg:p-8 max-w-7xl">
           {/* Welcome Section */}

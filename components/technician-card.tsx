@@ -1,22 +1,34 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Star, MapPin, Clock } from "lucide-react"
 import type { Technician } from "@/lib/data"
+
+// Default professional male profile image as fallback
+const DEFAULT_PROFESSIONAL_IMAGE = "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face"
 
 interface TechnicianCardProps {
   technician: Technician
 }
 
 export function TechnicianCard({ technician }: TechnicianCardProps) {
+  const [imgSrc, setImgSrc] = useState(technician.image || DEFAULT_PROFESSIONAL_IMAGE)
+
+  // Update imgSrc if technician object changes
+  useEffect(() => {
+    setImgSrc(technician.image || DEFAULT_PROFESSIONAL_IMAGE)
+  }, [technician.image])
+
   return (
     <div className="block group h-full">
       <div className="bg-card rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 transform group-hover:-translate-y-1 h-full flex flex-col">
         {/* Image Section - Link wrapper only for image */}
         <Link href={`/technician/${technician.id}`} className="relative h-48 overflow-hidden block">
           <img
-            src={technician.image || "/placeholder.svg"}
+            src={imgSrc}
             alt={technician.name}
+            onError={() => setImgSrc(DEFAULT_PROFESSIONAL_IMAGE)}
             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
@@ -97,7 +109,7 @@ export function TechnicianCard({ technician }: TechnicianCardProps) {
           {technician.type === "onsite" && (
             <div className="mt-auto pt-2">
               <Link href={`/technician/${technician.id}?request=open`} className="w-full block">
-                <button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-medium transition-colors">
+                <button className="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg font-medium transition-all duration-200 active:scale-[0.98] shadow-sm hover:shadow-md">
                   Send Job Request
                 </button>
               </Link>

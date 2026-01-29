@@ -16,6 +16,7 @@ import {
 import { Edit2 } from "lucide-react"
 import { UserData } from "@/hooks/use-user"
 import { karachiAreas } from "@/lib/data"
+import { ProfilePictureUpload } from "@/components/profile-picture-upload"
 
 const ONSITE_SERVICES = [
   "Electrician",
@@ -53,6 +54,10 @@ export function EditProfileDialog({ user, onSave }: EditProfileDialogProps) {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
     setErrors((prev) => ({ ...prev, [name]: "" }))
+  }
+
+  const handleImageUpload = (url: string) => {
+    setFormData((prev) => ({ ...prev, profilePicture: url }))
   }
 
   const toggleService = (service: string) => {
@@ -105,7 +110,7 @@ export function EditProfileDialog({ user, onSave }: EditProfileDialogProps) {
           Edit Profile
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Edit Profile</DialogTitle>
           <DialogDescription>
@@ -113,142 +118,148 @@ export function EditProfileDialog({ user, onSave }: EditProfileDialogProps) {
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4">
-          {/* Name */}
-          <div className="space-y-2">
-            <Label htmlFor="name" className="text-sm font-medium">
-              Full Name
-            </Label>
-            <Input
-              id="name"
-              name="name"
-              placeholder="Enter your full name"
-              value={formData.name || ""}
-              onChange={handleInputChange}
-              className="rounded-lg border-border"
-            />
-            {errors.name && <p className="text-sm text-red-500">{errors.name}</p>}
-          </div>
+        <div className="space-y-6 pt-2">
+          {/* Profile Picture Upload Section */}
+          <ProfilePictureUpload
+            currentImage={formData.profilePicture}
+            onUploadComplete={handleImageUpload}
+          />
 
-          {/* Email */}
-          <div className="space-y-2">
-            <Label htmlFor="email" className="text-sm font-medium">
-              Email Address
-            </Label>
-            <Input
-              id="email"
-              name="email"
-              type="email"
-              placeholder="you@example.com"
-              value={formData.email || ""}
-              onChange={handleInputChange}
-              className="rounded-lg border-border"
-            />
-            {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
-          </div>
+          <div className="space-y-4">
+            {/* Name */}
+            <div className="space-y-2">
+              <Label htmlFor="name" className="text-sm font-medium">
+                Full Name
+              </Label>
+              <Input
+                id="name"
+                name="name"
+                placeholder="Enter your full name"
+                value={formData.name || ""}
+                onChange={handleInputChange}
+                className="rounded-lg border-border"
+              />
+              {errors.name && <p className="text-sm text-red-500">{errors.name}</p>}
+            </div>
 
-          {/* Phone */}
-          <div className="space-y-2">
-            <Label htmlFor="phone" className="text-sm font-medium">
-              Phone Number
-            </Label>
-            <Input
-              id="phone"
-              name="phone"
-              placeholder="+92 300 1234567"
-              value={formData.phone || ""}
-              onChange={handleInputChange}
-              className="rounded-lg border-border"
-            />
-            {errors.phone && <p className="text-sm text-red-500">{errors.phone}</p>}
-          </div>
+            {/* Email */}
+            <div className="space-y-2">
+              <Label htmlFor="email" className="text-sm font-medium">
+                Email Address
+              </Label>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                placeholder="you@example.com"
+                value={formData.email || ""}
+                onChange={handleInputChange}
+                className="rounded-lg border-border"
+              />
+              {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
+            </div>
 
-          {/* Service Type - Display Only */}
-          {user.serviceType === "onsite" && (
-            <>
-              {/* Area - Onsite Only */}
-              <div className="space-y-2">
-                <Label htmlFor="area" className="text-sm font-medium">
-                  Service Area
-                </Label>
-                <Select
-                  value={formData.area || ""}
-                  onValueChange={(value) => setFormData((prev) => ({ ...prev, area: value }))}
-                >
-                  <SelectTrigger id="area" className="rounded-lg border-border">
-                    <SelectValue placeholder="Select your area" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {karachiAreas.filter((a) => a !== "All Areas").map((area) => (
-                      <SelectItem key={area} value={area}>
-                        {area}
-                      </SelectItem>
+            {/* Phone */}
+            <div className="space-y-2">
+              <Label htmlFor="phone" className="text-sm font-medium">
+                Phone Number
+              </Label>
+              <Input
+                id="phone"
+                name="phone"
+                placeholder="+92 300 1234567"
+                value={formData.phone || ""}
+                onChange={handleInputChange}
+                className="rounded-lg border-border"
+              />
+              {errors.phone && <p className="text-sm text-red-500">{errors.phone}</p>}
+            </div>
+
+            {/* Service Type - Display Only */}
+            {user.serviceType === "onsite" && (
+              <>
+                {/* Area - Onsite Only */}
+                <div className="space-y-2">
+                  <Label htmlFor="area" className="text-sm font-medium">
+                    Service Area
+                  </Label>
+                  <Select
+                    value={formData.area || ""}
+                    onValueChange={(value) => setFormData((prev) => ({ ...prev, area: value }))}
+                  >
+                    <SelectTrigger id="area" className="rounded-lg border-border">
+                      <SelectValue placeholder="Select your area" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {karachiAreas.filter((a) => a !== "All Areas").map((area) => (
+                        <SelectItem key={area} value={area}>
+                          {area}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {errors.area && <p className="text-sm text-red-500">{errors.area}</p>}
+                </div>
+
+                {/* Onsite Services */}
+                <div className="space-y-3">
+                  <Label className="text-sm font-medium">Services You Offer</Label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {ONSITE_SERVICES.map((service) => (
+                      <button
+                        key={service}
+                        type="button"
+                        onClick={() => toggleService(service)}
+                        className={`p-2 rounded-lg border-2 transition-all text-xs font-medium flex items-center gap-2 ${(formData.onsiteServices || []).includes(service)
+                            ? "border-primary bg-primary/10 text-primary"
+                            : "border-border text-muted-foreground hover:border-primary"
+                          }`}
+                      >
+                        {(formData.onsiteServices || []).includes(service) && "✓"}
+                        {service}
+                      </button>
                     ))}
-                  </SelectContent>
-                </Select>
-                {errors.area && <p className="text-sm text-red-500">{errors.area}</p>}
-              </div>
-
-              {/* Onsite Services */}
-              <div className="space-y-3">
-                <Label className="text-sm font-medium">Services You Offer</Label>
-                <div className="grid grid-cols-2 gap-2">
-                  {ONSITE_SERVICES.map((service) => (
-                    <button
-                      key={service}
-                      type="button"
-                      onClick={() => toggleService(service)}
-                      className={`p-2 rounded-lg border-2 transition-all text-xs font-medium flex items-center gap-2 ${
-                        (formData.onsiteServices || []).includes(service)
-                          ? "border-primary bg-primary/10 text-primary"
-                          : "border-border text-muted-foreground hover:border-primary"
-                      }`}
-                    >
-                      {(formData.onsiteServices || []).includes(service) && "✓"}
-                      {service}
-                    </button>
-                  ))}
+                  </div>
+                  {errors.services && <p className="text-sm text-red-500">{errors.services}</p>}
                 </div>
-                {errors.services && <p className="text-sm text-red-500">{errors.services}</p>}
-              </div>
-            </>
-          )}
+              </>
+            )}
 
-          {user.serviceType === "digital" && (
-            <>
-              {/* Digital Skills */}
-              <div className="space-y-3">
-                <Label className="text-sm font-medium">Skills You Offer</Label>
-                <div className="grid grid-cols-2 gap-2">
-                  {DIGITAL_SKILLS.map((skill) => (
-                    <button
-                      key={skill}
-                      type="button"
-                      onClick={() => toggleService(skill)}
-                      className={`p-2 rounded-lg border-2 transition-all text-xs font-medium flex items-center gap-2 ${
-                        (formData.digitalSkills || []).includes(skill)
-                          ? "border-primary bg-primary/10 text-primary"
-                          : "border-border text-muted-foreground hover:border-primary"
-                      }`}
-                    >
-                      {(formData.digitalSkills || []).includes(skill) && "✓"}
-                      {skill}
-                    </button>
-                  ))}
+            {user.serviceType === "digital" && (
+              <>
+                {/* Digital Skills */}
+                <div className="space-y-3">
+                  <Label className="text-sm font-medium">Skills You Offer</Label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {DIGITAL_SKILLS.map((skill) => (
+                      <button
+                        key={skill}
+                        type="button"
+                        onClick={() => toggleService(skill)}
+                        className={`p-2 rounded-lg border-2 transition-all text-xs font-medium flex items-center gap-2 ${(formData.digitalSkills || []).includes(skill)
+                            ? "border-primary bg-primary/10 text-primary"
+                            : "border-border text-muted-foreground hover:border-primary"
+                          }`}
+                      >
+                        {(formData.digitalSkills || []).includes(skill) && "✓"}
+                        {skill}
+                      </button>
+                    ))}
+                  </div>
+                  {errors.skills && <p className="text-sm text-red-500">{errors.skills}</p>}
                 </div>
-                {errors.skills && <p className="text-sm text-red-500">{errors.skills}</p>}
-              </div>
-            </>
-          )}
-        </div>
+              </>
+            )}
+          </div>
 
-        <div className="flex gap-3 justify-end pt-4">
-          <Button variant="outline" onClick={() => setOpen(false)}>
-            Cancel
-          </Button>
-          <Button onClick={handleSave} className="bg-primary hover:bg-primary/90">
-            Save Changes
-          </Button>
+          <div className="flex gap-3 justify-end pt-4">
+            <Button variant="outline" onClick={() => setOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleSave} className="bg-primary hover:bg-primary/90">
+              Save Changes
+            </Button>
+          </div>
         </div>
       </DialogContent>
     </Dialog>

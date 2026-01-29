@@ -1,18 +1,20 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { useState, useEffect } from "react"
 import { Menu, X, Wrench, LogOut, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useRouter } from "next/navigation"
 import { redirectByRole } from "@/utils/roleRedirect"
-import { initializeDemoUser } from "@/hooks/use-user"
+import { initializeDemoUser, useUser } from "@/hooks/use-user"
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const router = useRouter()
+  const { user } = useUser()
 
   useEffect(() => {
     // Initialize demo user on first page load
@@ -73,10 +75,19 @@ export function Navbar() {
               <>
                 <button
                   onClick={handleProfileClick}
-                  className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:bg-primary/90 transition-colors"
+                  className="w-10 h-10 rounded-full overflow-hidden border border-border bg-primary/10 flex items-center justify-center relative hover:bg-primary/20 transition-colors"
                   title="Go to Dashboard"
                 >
-                  <User className="w-5 h-5" />
+                  {user?.profilePicture ? (
+                    <Image
+                      src={user.profilePicture}
+                      alt={user.name || "User"}
+                      fill
+                      className="object-cover"
+                    />
+                  ) : (
+                    <User className="w-5 h-5 text-primary" />
+                  )}
                 </button>
                 <button
                   onClick={handleLogout}
@@ -116,9 +127,27 @@ export function Navbar() {
             <Link href="/technicians?serviceType=digital" className="block py-2 text-foreground" onClick={() => setIsOpen(false)}>
               Find Digital Services
             </Link>
-            
+
             {isAuthenticated ? (
               <div className="space-y-3 pt-3 border-t border-border">
+                <div className="flex items-center gap-3 py-2">
+                  <div className="w-10 h-10 rounded-full overflow-hidden border border-border bg-primary/10 flex items-center justify-center relative">
+                    {user?.profilePicture ? (
+                      <Image
+                        src={user.profilePicture}
+                        alt={user.name || "User"}
+                        fill
+                        className="object-cover"
+                      />
+                    ) : (
+                      <User className="w-5 h-5 text-primary" />
+                    )}
+                  </div>
+                  <div>
+                    <div className="text-sm font-medium text-foreground">{user?.name}</div>
+                    <div className="text-xs text-muted-foreground capitalize">{user?.role?.replace("_", " ")}</div>
+                  </div>
+                </div>
                 <button
                   onClick={() => {
                     handleProfileClick()

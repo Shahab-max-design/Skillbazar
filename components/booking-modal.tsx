@@ -97,7 +97,7 @@ export function BookingModal({ technician, isOpen, onClose }: BookingModalProps)
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-1.5">Date</label>
                   <div className="relative">
@@ -105,7 +105,7 @@ export function BookingModal({ technician, isOpen, onClose }: BookingModalProps)
                     <Input
                       type="date"
                       required
-                      className="pl-10"
+                      className="pl-10 w-full"
                       value={formData.date}
                       onChange={(e) => setFormData({ ...formData, date: e.target.value })}
                     />
@@ -118,7 +118,7 @@ export function BookingModal({ technician, isOpen, onClose }: BookingModalProps)
                     <Input
                       type="time"
                       required
-                      className="pl-10"
+                      className="pl-10 w-full"
                       value={formData.time}
                       onChange={(e) => setFormData({ ...formData, time: e.target.value })}
                     />

@@ -96,10 +96,11 @@ export default function DigitalDashboardPage() {
       <DashboardSidebar type="digital" />
 
       <div className="lg:ml-64">
-        <DashboardHeader 
-          title="Digital Services Dashboard" 
-          userName={displayName} 
-          userRole="Digital Provider" 
+        <DashboardHeader
+          title="Digital Services Dashboard"
+          userName={displayName}
+          userRole="Digital Provider"
+          profilePicture={user?.profilePicture}
         />
 
         <main className="p-4 lg:p-8">
@@ -171,13 +172,12 @@ export default function DigitalDashboardPage() {
 
                     <div className="flex items-center gap-3">
                       <span
-                        className={`px-3 py-1 rounded-full text-xs font-medium ${
-                          request.status === "pending"
+                        className={`px-3 py-1 rounded-full text-xs font-medium ${request.status === "pending"
                             ? "bg-yellow-100 text-yellow-800"
                             : request.status === "accepted"
-                            ? "bg-blue-100 text-blue-800"
-                            : "bg-green-100 text-green-800"
-                        }`}
+                              ? "bg-blue-100 text-blue-800"
+                              : "bg-green-100 text-green-800"
+                          }`}
                       >
                         {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
                       </span>

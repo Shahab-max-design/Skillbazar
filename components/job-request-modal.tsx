@@ -111,7 +111,7 @@ export function JobRequestModal({ technician, isOpen, onClose }: JobRequestModal
                     </DialogDescription>
                 </DialogHeader>
 
-                <form onSubmit={handleSubmit} className="space-y-4 py-4">
+                <form onSubmit={handleSubmit} className="space-y-4 py-4 px-1 sm:px-0">
                     <div className="space-y-2">
                         <Label htmlFor="title">Job Title <span className="text-red-500">*</span></Label>
                         <Input
@@ -132,7 +132,7 @@ export function JobRequestModal({ technician, isOpen, onClose }: JobRequestModal
                         />
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <Label>Date <span className="text-red-500">*</span></Label>
                             <Popover>
@@ -144,11 +144,11 @@ export function JobRequestModal({ technician, isOpen, onClose }: JobRequestModal
                                             !date && "text-muted-foreground"
                                         )}
                                     >
-                                        <CalendarIcon className="mr-2 h-4 w-4" />
-                                        {date ? format(date, "PPP") : <span>Pick a date</span>}
+                                        <CalendarIcon className="mr-2 h-4 w-4 shrink-0" />
+                                        <span className="truncate">{date ? format(date, "PPP") : <span>Pick a date</span>}</span>
                                     </Button>
                                 </PopoverTrigger>
-                                <PopoverContent className="w-auto p-0">
+                                <PopoverContent className="w-auto p-0" align="start">
                                     <Calendar
                                         mode="single"
                                         selected={date}
@@ -162,7 +162,7 @@ export function JobRequestModal({ technician, isOpen, onClose }: JobRequestModal
                         <div className="space-y-2">
                             <Label htmlFor="time">Preferred Time <span className="text-red-500">*</span></Label>
                             <Select onValueChange={(val) => setFormData({ ...formData, time: val })}>
-                                <SelectTrigger>
+                                <SelectTrigger className="w-full">
                                     <SelectValue placeholder="Select time" />
                                 </SelectTrigger>
                                 <SelectContent>
