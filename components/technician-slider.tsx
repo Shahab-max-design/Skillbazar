@@ -190,9 +190,25 @@ function ProfileCard({
 
   // Continuous Scaling Logic based on position
   const cardX = useTransform(xValue, (v) => v + index * (cardWidth + GAP) + cardWidth / 2)
-  const scale = useTransform(cardX, [containerCenter - cardWidth, containerCenter, containerCenter + cardWidth], [0.9, 1.05, 0.9])
-  const opacity = useTransform(cardX, [containerCenter - cardWidth, containerCenter, containerCenter + cardWidth], [0.6, 1, 0.6])
-  const zIndex = useTransform(cardX, [containerCenter - 2, containerCenter, containerCenter + 2], [10, 20, 10])
+
+  // Dribbble-style focus effect: Scale up when centered, scale down when away
+  const scale = useTransform(
+    cardX,
+    [containerCenter - cardWidth, containerCenter, containerCenter + cardWidth],
+    [0.9, 1.05, 0.9]
+  )
+
+  const opacity = useTransform(
+    cardX,
+    [containerCenter - cardWidth, containerCenter, containerCenter + cardWidth],
+    [0.6, 1, 0.6]
+  )
+
+  const zIndex = useTransform(
+    cardX,
+    [containerCenter - 2, containerCenter, containerCenter + 2],
+    [10, 20, 10]
+  )
 
   return (
     <motion.div
@@ -336,15 +352,16 @@ export function TechnicianSlider() {
       let vc = 5
       let cw = 300
 
-      if (w < 480) {
+      if (w < 640) {
+        // Mobile: Show one card prominently
         vc = 1
-        cw = w * 0.75
+        cw = w * 0.85 // Larger card on mobile for focus
       } else if (w < 768) {
         vc = 2
-        cw = 260
+        cw = 280
       } else if (w < 1024) {
         vc = 3
-        cw = 280
+        cw = 300
       } else if (w < 1280) {
         vc = 4
         cw = 280
@@ -388,19 +405,19 @@ export function TechnicianSlider() {
     x.set(targetX)
     setCurrentIndex(index)
 
-    // Infinite loop reset logic
+    // Infinite loop reset logic with smoother transition
     if (index >= profiles.length * 2) {
       setTimeout(() => {
-        const resetIndex = profiles.length
+        const resetIndex = index - profiles.length
         x.jump(-(resetIndex * (cardWidth + GAP)))
         setCurrentIndex(resetIndex)
-      }, 600)
+      }, 500)
     } else if (index < profiles.length) {
       setTimeout(() => {
-        const resetIndex = profiles.length * 2 - 1
+        const resetIndex = index + profiles.length
         x.jump(-(resetIndex * (cardWidth + GAP)))
         setCurrentIndex(resetIndex)
-      }, 600)
+      }, 500)
     }
   }
 
