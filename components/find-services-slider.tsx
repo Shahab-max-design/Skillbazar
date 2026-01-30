@@ -45,8 +45,8 @@ const services: Service[] = [
 ]
 
 const GAP = 24
-const AUTO_SCROLL_INTERVAL = 3500 // Slightly faster for responsiveness
-const MULTIPLIER = 5 // Odd number is best for centering
+const AUTO_SCROLL_INTERVAL = 4000
+const MULTIPLIER = 7
 
 // =============================================================================
 // CARD
@@ -66,63 +66,70 @@ function ServiceCard({
 }) {
     const Icon = service.icon
 
-    // Calculate center relative to container
-    // Position of card i = i * (cardWidth + GAP)
-    // Distance from center = (scrollX + i * (cardWidth + GAP) + cardWidth/2) - containerWidth/2
-    const centerX = useTransform(scrollX, (latest) => {
-        const cardCenter = latest + index * (cardWidth + GAP) + cardWidth / 2
-        return cardCenter - containerWidth / 2
+    // Distance Calculation relative to center of container
+    const distanceProxy = useTransform(scrollX, (latest) => {
+        // Center of this card in the X universe
+        const cardCenter = latest + (index * (cardWidth + GAP)) + (cardWidth / 2)
+        // Container Center
+        const containerCenter = containerWidth / 2
+        return cardCenter - containerCenter
     })
 
-    // Focus effects based on distance from center
-    const scale = useTransform(centerX, [-cardWidth, 0, cardWidth], [0.85, 1.12, 0.85])
-    const opacity = useTransform(centerX, [-cardWidth, 0, cardWidth], [0.3, 1, 0.3])
-    const y = useTransform(centerX, [-cardWidth, 0, cardWidth], [0, -32, 0])
-    const shadowOpacity = useTransform(centerX, [-cardWidth, 0, cardWidth], [0.1, 0.45, 0.1])
-    const borderAlpha = useTransform(centerX, [-cardWidth, 0, cardWidth], [0.05, 1, 0.05])
+    const scale = useTransform(distanceProxy, [-cardWidth, 0, cardWidth], [0.9, 1.1, 0.9])
+    const opacity = useTransform(distanceProxy, [-cardWidth, 0, cardWidth], [0.55, 1, 0.55])
+    const y = useTransform(distanceProxy, [-cardWidth, 0, cardWidth], [0, -32, 0])
+    const shadowOpacity = useTransform(distanceProxy, [-cardWidth, 0, cardWidth], [0.1, 0.5, 0.1])
+    const borderAlpha = useTransform(distanceProxy, [-cardWidth, 0, cardWidth], [0.1, 1, 0.1])
 
     return (
         <motion.div
             style={{
                 width: cardWidth,
+                marginRight: GAP,
                 scale,
                 opacity,
                 y,
-                padding: "48px 12px"
+                zIndex: useTransform(distanceProxy, (d) => Math.abs(d) < cardWidth / 2 ? 10 : 0)
             }}
-            className="flex-shrink-0"
+            className="flex-shrink-0 py-24 select-none relative"
         >
-            <Link href="#">
+            <Link href="#" draggable={false} className="block h-full cursor-grab active:cursor-grabbing">
                 <motion.div
                     style={{
-                        boxShadow: useTransform(shadowOpacity, (v) => `0 20px 60px rgba(59, 130, 246, ${v})`),
+                        boxShadow: useTransform(shadowOpacity, (v) => `0 25px 60px -10px rgba(59, 130, 246, ${v})`),
                         borderColor: useTransform(borderAlpha, (v) => `rgba(96, 165, 250, ${v})`)
                     }}
-                    className="relative bg-white rounded-[2.5rem] overflow-hidden border border-slate-100 transition-colors duration-500"
+                    className="bg-white rounded-[2rem] overflow-hidden border border-slate-200 h-full flex flex-col transition-colors duration-300"
                 >
-                    <div className="relative h-52 md:h-64 overflow-hidden">
+                    <div className="relative h-48 md:h-64 overflow-hidden bg-slate-100">
                         <motion.img
                             src={service.image}
-                            style={{
-                                scale: useTransform(centerX, [-cardWidth, 0, cardWidth], [1.2, 1.05, 1.2]),
-                                filter: useTransform(centerX, [-cardWidth, 0, cardWidth], ["grayscale(100%)", "grayscale(0%)", "grayscale(100%)"])
-                            }}
+                            draggable={false}
                             className="w-full h-full object-cover"
+                            style={{
+                                scale: useTransform(distanceProxy, [-cardWidth, 0, cardWidth], [1.1, 1, 1.1])
+                            }}
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent" />
-                        <div className="absolute top-4 left-4 px-4 py-2 rounded-full text-xs font-black tracking-widest uppercase text-white bg-blue-600/90 flex gap-2 backdrop-blur-sm">
-                            <Icon className="w-4 h-4" /> {service.type}
+                        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-transparent to-transparent" />
+                        <div className="absolute top-4 left-4 px-3 py-1.5 rounded-full text-[10px] sm:text-xs font-black tracking-widest uppercase text-white bg-blue-600/90 flex gap-2 backdrop-blur-sm border border-white/10">
+                            <Icon className="w-3 h-3 sm:w-4 sm:h-4" /> {service.type}
                         </div>
                     </div>
 
-                    <div className="p-8">
-                        <h3 className="text-2xl font-black text-slate-900 leading-tight">{service.name}</h3>
-                        <p className="mt-2 text-slate-600 text-sm line-clamp-2">{service.description}</p>
+                    <div className="p-6 md:p-8 flex flex-col flex-grow">
+                        <h3 className="text-xl md:text-2xl font-black text-slate-900 leading-tight mb-2">
+                            {service.name}
+                        </h3>
+                        <p className="text-slate-500 text-xs md:text-sm line-clamp-3 leading-relaxed mb-6">
+                            {service.description}
+                        </p>
 
-                        <div className="mt-8 flex justify-between items-center">
-                            <span className="text-xs tracking-[0.25em] font-black text-blue-600 uppercase">Explore Services</span>
-                            <div className={`w-12 h-12 rounded-full bg-gradient-to-r ${service.accent} flex items-center justify-center text-white shadow-lg`}>
-                                <ChevronRight className="w-6 h-6" />
+                        <div className="mt-auto flex justify-between items-center pt-4 border-t border-slate-50">
+                            <span className="text-[10px] tracking-[0.2em] font-black text-blue-600 uppercase">
+                                Explore
+                            </span>
+                            <div className={`w-10 h-10 rounded-full bg-gradient-to-r ${service.accent} flex items-center justify-center text-white shadow-lg`}>
+                                <ChevronRight className="w-5 h-5" />
                             </div>
                         </div>
                     </div>
@@ -139,182 +146,209 @@ export function FindServicesSlider() {
     const containerRef = useRef<HTMLDivElement>(null)
     const [containerWidth, setContainerWidth] = useState(0)
     const [cardWidth, setCardWidth] = useState(320)
+    const [activeIndex, setActiveIndex] = useState(0)
     const [isDragging, setIsDragging] = useState(false)
     const [isHovered, setIsHovered] = useState(false)
-    const [activeIndex, setActiveIndex] = useState(0)
 
+    // Data Setup
     const total = services.length
+    // Duplicate services enough times for smooth warping (Multiplier = 7 is safe)
     const extended = useMemo(() => Array(MULTIPLIER).fill(services).flat(), [])
-
     const centerSet = Math.floor(MULTIPLIER / 2)
     const startIndex = centerSet * total
 
-    // Primary Motion Values
+    // Motion Setup
     const scrollX = useMotionValue(0)
-    const springProps = { stiffness: 120, damping: 24, mass: 1 }
-    const springX = useSpring(scrollX, springProps)
+    const springX = useSpring(scrollX, {
+        stiffness: 120,
+        damping: 20,
+        mass: 1
+    })
 
-    // Helper: Calculate center offset for a given index
-    const getOffsetFor = useCallback((i: number) => {
+    // Calculate position for a specific index to be in the center
+    const getAnchorPosition = useCallback((index: number) => {
         if (!containerWidth) return 0
-        return containerWidth / 2 - cardWidth / 2 - i * (cardWidth + GAP)
+        const centerOffset = containerWidth / 2
+        const cardHalf = cardWidth / 2
+        const cardStart = index * (cardWidth + GAP)
+        // Formula derived: x + cardStart + cardHalf = centerOffset -> x = centerOffset - cardHalf - cardStart
+        return centerOffset - cardHalf - cardStart
     }, [containerWidth, cardWidth])
 
-    // Layout Management
+    // Layout Observer
     useEffect(() => {
         const updateLayout = () => {
             if (!containerRef.current) return
             const w = containerRef.current.offsetWidth
             setContainerWidth(w)
 
-            // Responsive card widths
-            const newCardWidth = w < 640 ? w * 0.85 : w < 1024 ? 360 : 400
+            // Responsive Card Width
+            let newCardWidth
+            if (w < 640) {
+                newCardWidth = Math.min(w * 0.85, 320)
+            } else if (w < 1024) {
+                newCardWidth = Math.min(w / 2.5, 360)
+            } else {
+                newCardWidth = Math.min(w / 3.5, 400)
+            }
             setCardWidth(newCardWidth)
         }
 
         updateLayout()
         const observer = new ResizeObserver(updateLayout)
-        observer.observe(containerRef.current!)
+        if (containerRef.current) observer.observe(containerRef.current)
         return () => observer.disconnect()
     }, [])
 
-    // Initial Position
+    // Recenter on resize
     useEffect(() => {
-        if (containerWidth === 0) return
-        const startPos = getOffsetFor(startIndex)
-        scrollX.set(startPos)
-        springX.jump(startPos)
-    }, [containerWidth, startIndex, getOffsetFor])
+        // Whenever widths change, jump to the current active index to maintain focus
+        if (containerWidth > 0 && cardWidth > 0) {
+            const target = getAnchorPosition(activeIndex || startIndex)
+            scrollX.set(target)
+            springX.jump(target) // Instant jump no anim
+        }
+    }, [containerWidth, cardWidth, getAnchorPosition, activeIndex, startIndex])
 
-    // Infinite Loop & Focus Math
-    useMotionValueEvent(scrollX, "change", (latest) => {
-        if (!containerWidth) return
+    // --- INFINITE LOOP & STATE SYNC ---
+    useMotionValueEvent(springX, "change", (latest) => {
+        if (!containerWidth || !cardWidth) return
 
-        // Calculate theoretical center index
-        const index = Math.round((containerWidth / 2 - latest - cardWidth / 2) / (cardWidth + GAP))
-        setActiveIndex(index)
+        const centerOffset = containerWidth / 2
+        // Calculate which index is visually in the best center position
+        // The formula: (CenterOffset - currentX - CardHalf) / (CardWidth + Gap)
+        const exactIndex = (centerOffset - latest - (cardWidth / 2)) / (cardWidth + GAP)
+        const safeIndex = Math.round(exactIndex)
 
-        // Seamless Warp Logic
-        // We want to stay within the central set [startIndex, startIndex + total - 1]
-        const minX = getOffsetFor(startIndex + total)
-        const maxX = getOffsetFor(startIndex - total)
+        // Normalize for UI (dots)
+        setActiveIndex(safeIndex)
 
-        if (latest <= minX) {
-            const diff = latest - minX
-            const jumpTo = getOffsetFor(startIndex) + diff
-            scrollX.set(jumpTo)
-            springX.jump(jumpTo)
-        } else if (latest >= maxX) {
+        // WARP LOGIC (Keep us in the middle set)
+        const minIndex = (centerSet - 1) * total
+        const maxIndex = (centerSet + 1) * total - 1
+
+        // Boundaries in pixels
+        const minX = getAnchorPosition(maxIndex) // rightmost limit
+        const maxX = getAnchorPosition(minIndex) // leftmost limit
+
+        if (latest < minX) {
+            const diff = minX - latest
+            const warpIndex = safeIndex - total
+            const warpPos = getAnchorPosition(warpIndex) - diff
+            scrollX.set(warpPos)
+            springX.jump(warpPos)
+        } else if (latest > maxX) {
             const diff = latest - maxX
-            const jumpTo = getOffsetFor(startIndex + total - 1) + diff
-            scrollX.set(jumpTo)
-            springX.jump(jumpTo)
+            const warpIndex = safeIndex + total
+            const warpPos = getAnchorPosition(warpIndex) + diff
+            scrollX.set(warpPos)
+            springX.jump(warpPos)
         }
     })
 
-    // Auto Scroll Logic
+    // --- AUTO SCROLL ---
     useEffect(() => {
         if (isDragging || isHovered) return
 
-        const timer = setInterval(() => {
-            const currentX = scrollX.get()
-            const currentIndex = Math.round((containerWidth / 2 - currentX - cardWidth / 2) / (cardWidth + GAP))
-            const targetX = getOffsetFor(currentIndex + 1)
-            scrollX.set(targetX)
+        const interval = setInterval(() => {
+            // Move one index forward
+            const nextIndex = activeIndex + 1
+            const target = getAnchorPosition(nextIndex)
+            scrollX.set(target)
         }, AUTO_SCROLL_INTERVAL)
 
-        return () => clearInterval(timer)
-    }, [isDragging, isHovered, containerWidth, getOffsetFor, cardWidth])
+        return () => clearInterval(interval)
+    }, [isDragging, isHovered, activeIndex, getAnchorPosition])
 
     const handleDragStart = () => setIsDragging(true)
 
     const handleDragEnd = (_: any, info: any) => {
         setIsDragging(false)
-
-        // Calculate snap point based on velocity
         const velocity = info.velocity.x
-        const currentX = scrollX.get()
+        const currentX = springX.get()
 
-        // Find current fractional index
-        const fractionalIndex = (containerWidth / 2 - currentX - cardWidth / 2) / (cardWidth + GAP)
+        // Predict where we end up
+        const centerOffset = containerWidth / 2
+        const exactIndex = (centerOffset - currentX - (cardWidth / 2)) / (cardWidth + GAP)
 
-        // Adjust for velocity (swipe)
-        let targetIndex = Math.round(fractionalIndex)
-        if (Math.abs(velocity) > 200) {
-            targetIndex = velocity > 0 ? Math.floor(fractionalIndex) : Math.ceil(fractionalIndex)
-        }
+        // Velocity assists the direction
+        const direction = velocity < 0 ? 1 : -1 // dragging left means increasing index
+        const momentum = Math.abs(velocity) > 200 ? 0.5 * direction : 0
 
-        const snapX = getOffsetFor(targetIndex)
+        const targetIndex = Math.round(exactIndex + momentum)
+        const targetPos = getAnchorPosition(targetIndex)
 
-        // Snap hard to target
-        scrollX.set(snapX)
+        scrollX.set(targetPos)
     }
 
     return (
         <section
-            className="py-24 bg-slate-50 overflow-hidden select-none"
+            className="py-24 bg-slate-50 overflow-hidden"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
         >
-            <div className="container mx-auto px-4 mb-20 text-center">
+            <div className="container mx-auto px-4 mb-16 text-center">
                 <h2 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight">
-                    Explore Our <span className="text-blue-600">Expert Services</span>
+                    Find <span className="text-blue-600">Services</span>
                 </h2>
                 <p className="mt-4 text-slate-500 max-w-2xl mx-auto font-medium">
-                    From home maintenance to digital transformation, find the right professional for your needs.
+                    Find the perfect professional for your home and business needs.
                 </p>
             </div>
 
-            <div ref={containerRef} className="relative w-full overflow-visible">
+            <div ref={containerRef} className="relative w-full h-[640px] flex items-center overflow-hidden">
                 <motion.div
+                    className="flex absolute left-0"
                     drag="x"
-                    dragConstraints={{ left: -10000, right: 10000 }} // Infinite drag
                     dragElastic={0.1}
                     onDragStart={handleDragStart}
                     onDragEnd={handleDragEnd}
-                    style={{ x: springX }}
-                    className="flex cursor-grab active:cursor-grabbing items-center"
+                    style={{ x: springX, cursor: isDragging ? "grabbing" : "grab" }}
                 >
-                    {extended.map((service, i) => (
+                    {extended.map((s, i) => (
                         <ServiceCard
                             key={i}
                             index={i}
-                            service={service}
+                            service={s}
                             cardWidth={cardWidth}
-                            scrollX={scrollX}
+                            scrollX={springX}
                             containerWidth={containerWidth}
                         />
                     ))}
                 </motion.div>
 
-                {/* Navigation Buttons */}
-                <div className="absolute top-1/2 left-0 right-0 -translate-y-1/2 flex justify-between px-4 md:px-12 pointer-events-none">
+                {/* Nav Buttons */}
+                <div className="absolute inset-0 pointer-events-none hidden lg:flex items-center justify-between px-12 max-w-[1400px] mx-auto">
                     <button
-                        onClick={() => scrollX.set(getOffsetFor(activeIndex - 1))}
-                        className="w-14 h-14 rounded-full bg-white/80 backdrop-blur-md shadow-xl border border-white flex items-center justify-center text-slate-900 pointer-events-auto hover:bg-blue-600 hover:text-white transition-all duration-300 -translate-x-full lg:translate-x-0"
+                        onClick={() => {
+                            const target = getAnchorPosition(activeIndex - 1)
+                            scrollX.set(target)
+                        }}
+                        className="pointer-events-auto w-14 h-14 rounded-full bg-white/80 shadow-2xl backdrop-blur-sm border border-white flex items-center justify-center text-slate-700 hover:scale-110 hover:bg-blue-600 hover:text-white transition-all duration-300"
                     >
                         <ChevronLeft className="w-6 h-6" />
                     </button>
                     <button
-                        onClick={() => scrollX.set(getOffsetFor(activeIndex + 1))}
-                        className="w-14 h-14 rounded-full bg-white/80 backdrop-blur-md shadow-xl border border-white flex items-center justify-center text-slate-900 pointer-events-auto hover:bg-blue-600 hover:text-white transition-all duration-300 translate-x-full lg:translate-x-0"
+                        onClick={() => {
+                            const target = getAnchorPosition(activeIndex + 1)
+                            scrollX.set(target)
+                        }}
+                        className="pointer-events-auto w-14 h-14 rounded-full bg-white/80 shadow-2xl backdrop-blur-sm border border-white flex items-center justify-center text-slate-700 hover:scale-110 hover:bg-blue-600 hover:text-white transition-all duration-300"
                     >
                         <ChevronRight className="w-6 h-6" />
                     </button>
                 </div>
             </div>
 
-            {/* Pagination Dots */}
-            <div className="mt-16 flex justify-center gap-3">
+            {/* Dots */}
+            <div className="flex justify-center gap-3 mt-4">
                 {services.map((_, i) => {
+                    // Safe modulo for negative numbers too
                     const normalizedActive = ((activeIndex % total) + total) % total
                     return (
                         <div
                             key={i}
-                            className={`h-2 transition-all duration-500 rounded-full ${i === normalizedActive
-                                ? "w-10 bg-blue-600"
-                                : "w-2 bg-slate-300"
-                                }`}
+                            className={`h-2 rounded-full transition-all duration-500 ${i === normalizedActive ? "w-10 bg-blue-600" : "w-2 bg-slate-300"}`}
                         />
                     )
                 })}
