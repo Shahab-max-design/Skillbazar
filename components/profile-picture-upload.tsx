@@ -12,8 +12,8 @@ interface ProfilePictureUploadProps {
 }
 
 // Cloudinary Configuration
-const CLOUD_NAME = "your_cloud_name" // Replace with your Cloudinary cloud name
-const UPLOAD_PRESET = "your_unsigned_preset" // Replace with your unsigned upload preset
+const CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
+const UPLOAD_PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET
 
 export function ProfilePictureUpload({ currentImage, onUploadComplete }: ProfilePictureUploadProps) {
     const [previewUrl, setPreviewUrl] = useState<string | null>(currentImage || null)
@@ -46,6 +46,26 @@ export function ProfilePictureUpload({ currentImage, onUploadComplete }: Profile
 
     const uploadToCloudinary = async (file: File) => {
         setIsUploading(true)
+        console.log("Starting upload to Cloudinary...", { cloudName: CLOUD_NAME, preset: UPLOAD_PRESET })
+
+        // Check if Cloudinary is configured
+        if (!CLOUD_NAME || !UPLOAD_PRESET || CLOUD_NAME === "your_cloud_name") {
+            console.warn("Cloudinary not configured properly. Falling back to local Data URL.")
+            // Fallback: Convert to Data URL
+            const reader = new FileReader()
+            reader.onload = (e) => {
+                const dataUrl = e.target?.result as string
+                onUploadComplete(dataUrl)
+                setPreviewUrl(dataUrl)
+                toast({
+                    title: "Success",
+                    description: "Profile picture updated (Local Storage - Cloudinary Config Missing)",
+                })
+                setIsUploading(false)
+            }
+            reader.readAsDataURL(file)
+            return
+        }
 
         const formData = new FormData()
         formData.append("file", file)
@@ -62,10 +82,12 @@ export function ProfilePictureUpload({ currentImage, onUploadComplete }: Profile
 
             if (!response.ok) {
                 const errorData = await response.json()
+                console.error("Cloudinary Error:", errorData)
                 throw new Error(errorData.error?.message || "Cloudinary upload failed")
             }
 
             const data = await response.json()
+            console.log("Upload success:", data)
             const cloudinaryUrl = data.secure_url
 
             onUploadComplete(cloudinaryUrl)
@@ -76,12 +98,19 @@ export function ProfilePictureUpload({ currentImage, onUploadComplete }: Profile
             })
         } catch (error: any) {
             console.error("Upload error:", error)
-            toast({
-                title: "Upload failed",
-                description: error.message || "There was an error uploading your image to Cloudinary.",
-                variant: "destructive"
-            })
-            setPreviewUrl(currentImage || null)
+
+            // On API failure, also fallback to Data URL so the user isn't stuck
+            console.log("Attempting fallback to local Data URL after API failure...")
+            const reader = new FileReader()
+            reader.onload = (e) => {
+                const dataUrl = e.target?.result as string
+                onUploadComplete(dataUrl)
+                toast({
+                    title: "Success",
+                    description: "Profile picture saved locally (API failed)",
+                })
+            }
+            reader.readAsDataURL(file)
         } finally {
             setIsUploading(false)
         }

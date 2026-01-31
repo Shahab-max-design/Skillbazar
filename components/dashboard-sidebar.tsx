@@ -143,11 +143,11 @@ export function DashboardSidebar({ type }: DashboardSidebarProps) {
               key={link.href}
               href={link.href}
               onClick={handleLinkClick}
-              className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${isActive ? "bg-primary text-primary-foreground" : "text-gray-400 hover:bg-white/5 hover:text-white"
+              className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors overflow-hidden ${isActive ? "bg-primary text-primary-foreground" : "text-gray-400 hover:bg-white/5 hover:text-white"
                 }`}
             >
               <link.icon className="w-5 h-5 flex-shrink-0" />
-              <span className="font-medium">{link.name}</span>
+              <span className="font-medium truncate">{link.name}</span>
             </Link>
           )
         })}

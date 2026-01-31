@@ -63,7 +63,7 @@ const DEFAULT_USER_DATA: UserData = {
 // Initialize with demo user
 export function initializeDemoUser() {
   if (typeof window === "undefined") return
-  
+
   const users = localStorage.getItem(USERS_STORAGE_KEY)
   if (!users) {
     const defaultUsers: UserData[] = [
@@ -118,10 +118,10 @@ export function useUser() {
   // Load user from localStorage on mount
   useEffect(() => {
     initializeDemoUser()
-    
+
     const isLoggedIn = localStorage.getItem(STORAGE_KEY_LOGGED_IN) === "true"
     const storedUser = localStorage.getItem(STORAGE_KEY)
-    
+
     if (isLoggedIn && storedUser) {
       try {
         setUser(JSON.parse(storedUser))
@@ -140,7 +140,7 @@ export function useUser() {
     const users = JSON.parse(localStorage.getItem(USERS_STORAGE_KEY) || "[]")
     users.push(userData)
     localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users))
-    
+
     // Clear login status
     localStorage.removeItem(STORAGE_KEY_LOGGED_IN)
     localStorage.removeItem(STORAGE_KEY)
@@ -151,10 +151,10 @@ export function useUser() {
     const users = JSON.parse(localStorage.getItem(USERS_STORAGE_KEY) || "[]")
     console.log("Available users:", users.map((u: any) => ({ email: u.email, role: u.role })));
     console.log("Attempting to login with:", { email, password });
-    
+
     const foundUser = users.find((u: UserData) => u.email === email && u.password === password)
     console.log("Found user:", foundUser);
-    
+
     if (foundUser) {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(foundUser))
       localStorage.setItem(STORAGE_KEY_LOGGED_IN, "true")
@@ -169,13 +169,26 @@ export function useUser() {
   const saveUser = (userData: UserData) => {
     setUser(userData)
     localStorage.setItem(STORAGE_KEY, JSON.stringify(userData))
+    window.dispatchEvent(new Event("user-updated"))
   }
+
+  // Reload user data when updated elsewhere
+  useEffect(() => {
+    const handleUserUpdate = () => {
+      const storedUser = localStorage.getItem(STORAGE_KEY)
+      if (storedUser) {
+        setUser(JSON.parse(storedUser))
+      }
+    }
+    window.addEventListener("user-updated", handleUserUpdate)
+    return () => window.removeEventListener("user-updated", handleUserUpdate)
+  }, [])
 
   const updateUser = (updates: Partial<UserData>) => {
     if (!user) return
     const updatedUser = { ...user, ...updates } as UserData
     saveUser(updatedUser)
-    
+
     // Also update in users list
     const users = JSON.parse(localStorage.getItem(USERS_STORAGE_KEY) || "[]")
     const index = users.findIndex((u: UserData) => u.email === user.email)

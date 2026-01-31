@@ -47,7 +47,16 @@ interface EditProfileDialogProps {
 
 export function EditProfileDialog({ user, onSave }: EditProfileDialogProps) {
   const [open, setOpen] = useState(false)
-  const [formData, setFormData] = useState<UserData>(user)
+  const [formData, setFormData] = useState<UserData>({
+    ...user,
+    name: user.name || "",
+    email: user.email || "",
+    phone: user.phone || "",
+    area: user.area || "",
+    profilePicture: user.profilePicture || "",
+    onsiteServices: user.onsiteServices || [],
+    digitalSkills: user.digitalSkills || [],
+  })
   const [errors, setErrors] = useState<Record<string, string>>({})
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -211,8 +220,8 @@ export function EditProfileDialog({ user, onSave }: EditProfileDialogProps) {
                         type="button"
                         onClick={() => toggleService(service)}
                         className={`p-2 rounded-lg border-2 transition-all text-xs font-medium flex items-center gap-2 ${(formData.onsiteServices || []).includes(service)
-                            ? "border-primary bg-primary/10 text-primary"
-                            : "border-border text-muted-foreground hover:border-primary"
+                          ? "border-primary bg-primary/10 text-primary"
+                          : "border-border text-muted-foreground hover:border-primary"
                           }`}
                       >
                         {(formData.onsiteServices || []).includes(service) && "✓"}
@@ -237,8 +246,8 @@ export function EditProfileDialog({ user, onSave }: EditProfileDialogProps) {
                         type="button"
                         onClick={() => toggleService(skill)}
                         className={`p-2 rounded-lg border-2 transition-all text-xs font-medium flex items-center gap-2 ${(formData.digitalSkills || []).includes(skill)
-                            ? "border-primary bg-primary/10 text-primary"
-                            : "border-border text-muted-foreground hover:border-primary"
+                          ? "border-primary bg-primary/10 text-primary"
+                          : "border-border text-muted-foreground hover:border-primary"
                           }`}
                       >
                         {(formData.digitalSkills || []).includes(skill) && "✓"}

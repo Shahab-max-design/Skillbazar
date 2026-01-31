@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { useUser } from "@/hooks/use-user"
 import { ArrowLeft, User, Mail, Phone, Link as LinkIcon } from "lucide-react"
+import { ProfilePictureUpload } from "@/components/profile-picture-upload"
 
 export default function DigitalProfilePage() {
   const router = useRouter()
@@ -20,7 +21,8 @@ export default function DigitalProfilePage() {
     email: user?.email || "",
     phone: user?.phone || "",
     portfolioLink: user?.portfolioLink || "",
-    bio: user?.bio || "",
+    bio: (user as any)?.bio || "",
+    profilePicture: user?.profilePicture || "",
   })
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -46,10 +48,10 @@ export default function DigitalProfilePage() {
       <DashboardSidebar type="digital" />
 
       <div className="lg:ml-64">
-        <DashboardHeader 
-          title="Profile" 
-          userName={user?.name || "Digital Provider"} 
-          userRole="Digital Provider" 
+        <DashboardHeader
+          title="Profile"
+          userName={user?.name || "Digital Provider"}
+          userRole="Digital Provider"
         />
 
         <main className="p-4 lg:p-8">
@@ -78,9 +80,10 @@ export default function DigitalProfilePage() {
             <div className="bg-background rounded-lg border border-border p-6">
               <div className="flex items-start justify-between mb-6">
                 <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                    <User className="w-8 h-8 text-primary" />
-                  </div>
+                  <ProfilePictureUpload
+                    currentImage={formData.profilePicture || user?.profilePicture}
+                    onUploadComplete={(url) => setFormData(prev => ({ ...prev, profilePicture: url }))}
+                  />
                   <div>
                     <h2 className="text-xl font-semibold text-foreground">
                       {user?.name || "Digital Provider"}

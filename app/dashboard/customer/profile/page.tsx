@@ -2,15 +2,18 @@
 
 import { DashboardSidebar } from "@/components/dashboard-sidebar"
 import { DashboardHeader } from "@/components/dashboard-header"
-import { useUser } from "@/hooks/use-user"
+import { useUser, UserData } from "@/hooks/use-user"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Progress } from "@/components/ui/progress"
-import { Mail, Phone, User as UserIcon, Edit2, Calendar } from "lucide-react"
+import { Mail, Phone, User as UserIcon } from "lucide-react"
+import { EditProfileDialog } from "@/components/edit-profile-dialog"
+import { useToast } from "@/hooks/use-toast"
 
 export default function ProfilePage() {
-  const { user } = useUser()
+  const { user, updateUser } = useUser()
+  const { toast } = useToast()
 
   if (!user) {
     return (
@@ -36,6 +39,14 @@ export default function ProfilePage() {
   const fields = [user.name, user.email, user.phone, user.profilePicture]
   const completedFields = fields.filter(Boolean).length
   const completionPercentage = Math.round((completedFields / fields.length) * 100)
+
+  const handleProfileSave = (updatedUser: UserData) => {
+    updateUser(updatedUser)
+    toast({
+      title: "Success",
+      description: "Profile updated successfully",
+    })
+  }
 
   return (
     <div className="min-h-screen bg-white">
@@ -74,10 +85,7 @@ export default function ProfilePage() {
                   <Progress value={completionPercentage} className="h-2" />
                 </div>
 
-                <Button className="bg-green-600 hover:bg-green-700 gap-2">
-                  <Edit2 className="w-4 h-4" />
-                  Edit Profile
-                </Button>
+                <EditProfileDialog user={user} onSave={handleProfileSave} />
               </div>
             </div>
 
