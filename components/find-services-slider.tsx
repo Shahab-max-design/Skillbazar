@@ -45,7 +45,7 @@ const services: Service[] = [
 ]
 
 const GAP = 24
-const AUTO_SCROLL_INTERVAL = 4000
+const AUTO_SCROLL_INTERVAL = 2000
 const MULTIPLIER = 7
 
 // =============================================================================
