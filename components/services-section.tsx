@@ -17,28 +17,28 @@ const onsiteServices = [
     name: "Plumber",
     description: "Pipe fitting, leak repairs, fixtures",
     color: "bg-blue-500",
-    image: "https://images.unsplash.com/photo-1621905251918-48416bd8575a?w=800&h=600&fit=crop&q=85&auto=format",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSNvVtblAruh4H14EDDM3k9Ci2G_506_iTbHA&s",
   },
   {
     icon: Wind,
     name: "AC Repair",
     description: "Installation, servicing & gas refill",
     color: "bg-cyan-500",
-    image: "https://images.unsplash.com/photo-1585771724684-38269d6639fd?w=800&h=600&fit=crop&q=85&auto=format",
+    image: "https://plus.unsplash.com/premium_photo-1682126012378-859ca7a9f4cf?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8YWMlMjByZXBhaXJ8ZW58MHx8MHx8fDA%3D",
   },
   {
     icon: Hammer,
     name: "Carpenter",
     description: "Furniture, cabinets & woodwork",
     color: "bg-amber-600",
-    image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&h=600&fit=crop&q=85&auto=format",
+    image: "https://images.unsplash.com/photo-1626081063434-79a2169791b1?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8Y2FycGVudGVyfGVufDB8fDB8fHww",
   },
   {
     icon: Paintbrush,
     name: "Painter",
     description: "Interior, exterior & textures",
     color: "bg-rose-500",
-    image: "https://images.unsplash.com/photo-1537633552985-caf1ddac270e?w=800&h=600&fit=crop&q=85&auto=format",
+    image: "https://media.istockphoto.com/id/2223733276/photo/painter-painting-a-wall-with-a-paint-roller-in-green-and-turquoise.webp?a=1&b=1&s=612x612&w=0&k=20&c=5lW30kL34rz9vPDydRs5bHQymjhpYjEnmTVgffya4dA=",
   },
   {
     icon: Wrench,
@@ -90,7 +90,7 @@ const digitalServices = [
     name: "Video Editor",
     description: "Editing, motion graphics & post-production",
     color: "bg-red-500",
-    image: "https://images.unsplash.com/photo-1574717436401-063d29143eaf?w=800&h=600&fit=crop&q=85&auto=format",
+    image: "https://images.unsplash.com/photo-1605826832916-d0ea9d6fe71e?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fHZpZGVvJTIwZWRpdGluZ3xlbnwwfHwwfHx8MA%3D%3D",
   },
 ]
 
