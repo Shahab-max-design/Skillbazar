@@ -69,7 +69,8 @@ export function CustomerRequestList() {
     }, [user])
 
     const handleCancel = (id: string) => {
-        if (!confirm("Are you sure you want to cancel this request?")) return
+        // Removed confirm dialog for smoother UX as requested
+        // if (!confirm("Are you sure you want to cancel this request?")) return
 
         const stored = localStorage.getItem("technicianRequests")
         if (stored) {

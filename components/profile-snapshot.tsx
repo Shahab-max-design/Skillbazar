@@ -40,9 +40,9 @@ export function ProfileSnapshot({ user, onEditClick }: ProfileSnapshotProps) {
         </Avatar>
 
         {/* Name */}
-        <div>
-          <h3 className="font-semibold text-foreground">{user.name || "User"}</h3>
-          <p className="text-xs text-muted-foreground">{user.email}</p>
+        <div className="w-full overflow-hidden px-2">
+          <h3 className="font-semibold text-foreground truncate">{user.name || "User"}</h3>
+          <p className="text-xs text-muted-foreground truncate">{user.email}</p>
         </div>
 
         {/* Profile Completion */}

@@ -135,10 +135,10 @@ export function ProfileWidget({ onEditClick }: ProfileWidgetProps) {
         </div>
 
         {/* Name & Email */}
-        <div>
-          <h3 className="font-semibold text-foreground">{user.name || "User"}</h3>
-          <p className="text-xs text-muted-foreground truncate">{user.email}</p>
-          {user.phone && <p className="text-xs text-muted-foreground">{user.phone}</p>}
+        <div className="w-full overflow-hidden">
+          <h3 className="font-semibold text-foreground truncate">{user.name || "User"}</h3>
+          <p className="text-xs text-muted-foreground truncate w-full">{user.email}</p>
+          {user.phone && <p className="text-xs text-muted-foreground truncate">{user.phone}</p>}
         </div>
 
         {/* Profile Completion */}
