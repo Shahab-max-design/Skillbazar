@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Star, MapPin, Clock } from "lucide-react"
 import type { Technician } from "@/lib/data"
+import { JobRequestModal } from "@/components/job-request-modal"
 
 // Default professional male profile image as fallback
 const DEFAULT_PROFESSIONAL_IMAGE = "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face"
@@ -14,11 +15,26 @@ interface TechnicianCardProps {
 
 export function TechnicianCard({ technician }: TechnicianCardProps) {
   const [imgSrc, setImgSrc] = useState(technician.image || DEFAULT_PROFESSIONAL_IMAGE)
+  const [requestSent, setRequestSent] = useState(false)
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
   // Update imgSrc if technician object changes
   useEffect(() => {
     setImgSrc(technician.image || DEFAULT_PROFESSIONAL_IMAGE)
   }, [technician.image])
+
+  const handleOpenModal = () => {
+    setIsModalOpen(true)
+  }
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false)
+  }
+
+  const handleRequestSuccess = () => {
+    setRequestSent(true)
+    setIsModalOpen(false)
+  }
 
   return (
     <div className="block group h-full">
@@ -108,15 +124,30 @@ export function TechnicianCard({ technician }: TechnicianCardProps) {
           {/* Action Button - ONSITE ONLY */}
           {technician.type === "onsite" && (
             <div className="mt-auto pt-2">
-              <Link href={`/technician/${technician.id}?request=open`} className="w-full block">
-                <button className="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg font-medium transition-all duration-200 active:scale-[0.98] shadow-sm hover:shadow-md">
+              {requestSent ? (
+                <div className="w-full bg-green-50 border border-green-200 text-green-700 py-3 px-4 rounded-lg text-sm font-medium text-center">
+                  ✅ Your request has been sent. Please wait for approval.
+                </div>
+              ) : (
+                <button
+                  onClick={handleOpenModal}
+                  className="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg font-medium transition-all duration-200 active:scale-[0.98] shadow-sm hover:shadow-md"
+                >
                   Send Job Request
                 </button>
-              </Link>
+              )}
             </div>
           )}
         </div>
       </div>
+
+      {/* Job Request Modal */}
+      <JobRequestModal
+        technician={technician}
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        onSuccess={handleRequestSuccess}
+      />
     </div>
   )
 }

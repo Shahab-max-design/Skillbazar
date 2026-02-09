@@ -16,6 +16,7 @@ export interface Technician {
   image: string
   type: "onsite" | "digital"
   service?: string // For digital services: web-development, graphic-design, content-writing
+  coverImage?: string
 }
 
 export interface Booking {
@@ -943,6 +944,7 @@ export const technicians: Technician[] = [
     image: "https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?w=400&h=400&fit=crop&crop=face",
     type: "digital",
     service: "web-development",
+    coverImage: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=800&q=80", // Web Development
   },
   {
     id: "d-2",
@@ -962,6 +964,7 @@ export const technicians: Technician[] = [
     image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face",
     type: "digital",
     service: "graphic-design",
+    coverImage: "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=800&q=80", // Graphic Design (New)
   },
   {
     id: "d-3",
@@ -981,6 +984,7 @@ export const technicians: Technician[] = [
     image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face",
     type: "digital",
     service: "uiux-designer",
+    coverImage: "https://images.unsplash.com/photo-1559028012-481c04fa702d?w=800&q=80", // UI/UX Design (New)
   },
   {
     id: "d-4",
@@ -1000,6 +1004,7 @@ export const technicians: Technician[] = [
     image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face",
     type: "digital",
     service: "seo-specialist",
+    coverImage: "https://plus.unsplash.com/premium_photo-1685283298465-e52e933a3312?w=800&q=80", // SEO (Updated)
   },
   {
     id: "d-5",
@@ -1019,6 +1024,7 @@ export const technicians: Technician[] = [
     image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face",
     type: "digital",
     service: "content-writing",
+    coverImage: "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=800&q=80", // Content Writing (Updated)
   },
   {
     id: "d-6",
@@ -1038,6 +1044,7 @@ export const technicians: Technician[] = [
     image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face",
     type: "digital",
     service: "video-editor",
+    coverImage: "https://images.unsplash.com/photo-1528109966604-5a6a4a964e8d?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8dmlkZW8lMjBlZGl0b3J8ZW58MHx8MHx8fDA%3D", // Video Editing
   },
   {
     id: "d-7",
@@ -1057,6 +1064,7 @@ export const technicians: Technician[] = [
     image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face",
     type: "digital",
     service: "digital-marketing",
+    coverImage: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80", // Digital Marketing
   },
   {
     id: "d-8",
@@ -1076,6 +1084,7 @@ export const technicians: Technician[] = [
     image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face",
     type: "digital",
     service: "data-analyst",
+    coverImage: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80", // Data Analysis
   },
 ]
 

@@ -5,6 +5,8 @@ import { useSearchParams } from "next/navigation"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
 import { TechnicianCard } from "@/components/technician-card"
+import { DigitalServiceCard } from "@/components/digital-service-card"
+import { OrderServiceModal } from "@/components/order-service-modal"
 import { technicians, karachiAreas, services } from "@/lib/data"
 import { Search, MapPin, Filter, ChevronDown, X, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -26,6 +28,10 @@ function TechniciansContent() {
   const [isLoading, setIsLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
   const [filteredTechnicians, setFilteredTechnicians] = useState(technicians)
+
+  // Modal State
+  const [isOrderModalOpen, setIsOrderModalOpen] = useState(false)
+  const [selectedProvider, setSelectedProvider] = useState<any>(null)
 
   useEffect(() => {
     setIsLoading(true)
@@ -73,6 +79,11 @@ function TechniciansContent() {
     setSelectedService("All Services")
     setSelectedServiceType("all")
     setSearchQuery("")
+  }
+
+  const handleOrderClick = (technician: any) => {
+    setSelectedProvider(technician)
+    setIsOrderModalOpen(true)
   }
 
   const hasFilters = selectedArea !== "All Areas" || selectedService !== "All Services" || selectedServiceType !== "all" || searchQuery !== ""
@@ -288,10 +299,28 @@ function TechniciansContent() {
             <p className="text-muted-foreground">Finding technicians...</p>
           </div>
         ) : filteredTechnicians.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredTechnicians.map((technician, index) => (
               <div key={technician.id} className="animate-fade-in-up" style={{ animationDelay: `${index * 100}ms` }}>
-                <TechnicianCard technician={technician} />
+                {technician.type === 'digital' ? (
+                  <div className="h-full">
+                    <DigitalServiceCard
+                      id={technician.id}
+                      providerName={technician.name}
+                      providerAvatar={technician.image}
+                      serviceTitle={technician.skill}
+                      description={`${technician.name} is a professional ${technician.skill} with ${technician.experience} of experience. delivering high quality work.`}
+                      startingPrice={technician.rate}
+                      deliveryTime="3-5 Days"
+                      rating={technician.rating}
+                      reviews={technician.reviews}
+                      onOrderClick={() => handleOrderClick(technician)}
+                      image={technician.coverImage}
+                    />
+                  </div>
+                ) : (
+                  <TechnicianCard technician={technician} />
+                )}
               </div>
             ))}
           </div>
@@ -310,6 +339,18 @@ function TechniciansContent() {
       </div>
 
       <Footer />
+
+      {selectedProvider && (
+        <OrderServiceModal
+          isOpen={isOrderModalOpen}
+          onClose={() => setIsOrderModalOpen(false)}
+          serviceTitle={selectedProvider.skill}
+          providerName={selectedProvider.name}
+          startingPrice={selectedProvider.rate}
+          providerId={selectedProvider.id}
+          providerImage={selectedProvider.image}
+        />
+      )}
     </main>
   )
 }

@@ -4,6 +4,7 @@ import { DashboardHeader } from "@/components/dashboard-header"
 import { DashboardSidebar } from "@/components/dashboard-sidebar"
 import { useUser } from "@/hooks/use-user"
 import { CustomerRequestList } from "@/components/customer-request-list"
+import { CustomerDigitalOrdersList } from "@/components/customer-digital-orders-list"
 
 export default function BookingsPage() {
   const { user } = useUser()
@@ -26,6 +27,16 @@ export default function BookingsPage() {
           </div>
 
           <CustomerRequestList />
+
+          {/* My Digital Orders Section */}
+          <div className="mt-12">
+            <h1 className="text-2xl font-bold text-foreground">My Digital Orders</h1>
+            <p className="text-muted-foreground mt-2">
+              Track your digital service orders including logo design, video editing, and more.
+            </p>
+          </div>
+
+          <CustomerDigitalOrdersList />
         </main>
       </div>
     </div>

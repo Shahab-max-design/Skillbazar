@@ -19,9 +19,10 @@ interface JobRequestModalProps {
     technician: Technician
     isOpen: boolean
     onClose: () => void
+    onSuccess?: () => void
 }
 
-export function JobRequestModal({ technician, isOpen, onClose }: JobRequestModalProps) {
+export function JobRequestModal({ technician, isOpen, onClose, onSuccess }: JobRequestModalProps) {
     const { toast } = useToast()
     const { user } = useUser()
     const router = useRouter()
@@ -94,10 +95,18 @@ export function JobRequestModal({ technician, isOpen, onClose }: JobRequestModal
                 title: "Request Sent!",
                 description: "The technician will review your request shortly.",
             })
+
+            // Call onSuccess callback if provided (for card state update)
+            if (onSuccess) {
+                onSuccess()
+            }
+
             onClose()
 
-            // Redirect to customer dashboard to see the request
-            router.push("/dashboard/customer")
+            // Only redirect if no onSuccess callback (backward compatibility)
+            if (!onSuccess) {
+                router.push("/dashboard/customer")
+            }
         }, 1500)
     }
 
