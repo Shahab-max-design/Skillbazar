@@ -64,9 +64,9 @@ export default function ProfilePage() {
 
           {/* Profile Section */}
           <Card className="p-8 mb-6">
-            <div className="flex gap-6 mb-8">
+            <div className="flex flex-col md:flex-row gap-6 mb-8">
               {/* Avatar */}
-              <Avatar className="w-32 h-32 border-4 border-green-200">
+              <Avatar className="w-24 h-24 md:w-32 md:h-32 border-4 border-green-200 self-center md:self-start">
                 <AvatarImage src={user.profilePicture} alt={user.name} />
                 <AvatarFallback>{initials}</AvatarFallback>
               </Avatar>

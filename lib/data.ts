@@ -94,10 +94,10 @@ export const subscriptionPlans: SubscriptionPlan[] = [
     name: "Free",
     price: "Free",
     priceLabel: "Free Forever",
-    credits: 3,
+    credits: 10,
     features: [
       "Limited profile visibility",
-      "3 service leads",
+      "10 service leads",
       "No priority placement",
       "Basic support",
     ],

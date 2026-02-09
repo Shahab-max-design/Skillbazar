@@ -78,8 +78,8 @@ export default function DigitalProfilePage() {
           <div className="grid gap-6 max-w-2xl">
             {/* Profile Card */}
             <div className="bg-background rounded-lg border border-border p-6">
-              <div className="flex items-start justify-between mb-6">
-                <div className="flex items-center gap-4">
+              <div className="flex flex-col md:flex-row items-center md:items-start justify-between mb-6 gap-4">
+                <div className="flex flex-col md:flex-row items-center gap-4 text-center md:text-left">
                   <ProfilePictureUpload
                     currentImage={formData.profilePicture || user?.profilePicture}
                     onUploadComplete={(url) => setFormData(prev => ({ ...prev, profilePicture: url }))}

@@ -103,7 +103,7 @@ export function ProfileWidget({ onEditClick }: ProfileWidgetProps) {
   }
 
   return (
-    <Card className="p-6 sticky top-4">
+    <Card className="p-4 md:p-6 sticky top-4 max-w-[100vw] overflow-hidden">
       <div className="text-center space-y-4">
         {/* Avatar with Upload */}
         <div className="relative inline-block group">
