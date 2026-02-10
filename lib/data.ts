@@ -61,6 +61,28 @@ export interface TechnicianSubscription {
   renewalDate?: string
 }
 
+export interface TechnicianLocalService {
+  id: string
+  technicianId: string
+  title: string
+  description: string
+  category: string
+  city: string
+  area: string
+  startingPrice: number
+  availability: {
+    days: string[]
+    timeFrom: string
+    timeTo: string
+  }
+  experience: number
+  status: "active" | "inactive"
+  images: string[]
+  createdAt: string
+  updatedAt: string
+}
+
+
 export const karachiAreas = [
   "All Areas",
   "DHA",

@@ -33,6 +33,8 @@ export default function DigitalGigsPage() {
   const { user } = useUser()
   const [gigs, setGigs] = useState<Gig[]>([])
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [editingGig, setEditingGig] = useState<Gig | null>(null)
+  const [deletingGigId, setDeletingGigId] = useState<string | null>(null)
 
   const loadGigs = () => {
     const stored = localStorage.getItem("providerGigs")
@@ -55,17 +57,26 @@ export default function DigitalGigsPage() {
     }
   }, [])
 
+  const handleEdit = (gig: Gig) => {
+    setEditingGig(gig)
+    setIsModalOpen(true)
+  }
+
   const handleDelete = (id: string) => {
-    if (confirm("Are you sure you want to delete this gig?")) {
-      const stored = localStorage.getItem("providerGigs")
-      if (stored) {
-        const allGigs: Gig[] = JSON.parse(stored)
-        const updatedGigs = allGigs.filter(g => g.id !== id)
-        localStorage.setItem("providerGigs", JSON.stringify(updatedGigs))
-        window.dispatchEvent(new Event("new-gig-created"))
-        loadGigs()
-      }
+    const stored = localStorage.getItem("providerGigs")
+    if (stored) {
+      const allGigs: Gig[] = JSON.parse(stored)
+      const updatedGigs = allGigs.filter(g => g.id !== id)
+      localStorage.setItem("providerGigs", JSON.stringify(updatedGigs))
+      window.dispatchEvent(new Event("new-gig-created"))
+      loadGigs()
+      setDeletingGigId(null)
     }
+  }
+
+  const handleModalClose = () => {
+    setIsModalOpen(false)
+    setEditingGig(null)
   }
 
   return (
@@ -147,27 +158,56 @@ export default function DigitalGigsPage() {
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between pt-4 border-t border-border">
-                      <div className="text-sm text-muted-foreground">
-                        {gig.orders} orders
+                    {deletingGigId === gig.id ? (
+                      <div className="pt-4 border-t border-border">
+                        <p className="text-sm text-foreground mb-3">Are you sure you want to delete this gig?</p>
+                        <div className="flex gap-2">
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            className="flex-1"
+                            onClick={() => handleDelete(gig.id)}
+                          >
+                            Delete
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="flex-1"
+                            onClick={() => setDeletingGigId(null)}
+                          >
+                            Cancel
+                          </Button>
+                        </div>
                       </div>
-                      <div className="flex gap-2">
-                        <Button variant="outline" size="sm" className="h-8 px-2">
-                          <Edit className="w-3.5 h-3.5" />
-                        </Button>
-                        <Button variant="outline" size="sm" className="h-8 px-2">
-                          <Eye className="w-3.5 h-3.5" />
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="h-8 px-2 text-red-600 hover:text-red-700 hover:bg-red-50"
-                          onClick={() => handleDelete(gig.id)}
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </Button>
+                    ) : (
+                      <div className="flex items-center justify-between pt-4 border-t border-border">
+                        <div className="text-sm text-muted-foreground">
+                          {gig.orders} orders
+                        </div>
+                        <div className="flex gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-8 px-2"
+                            onClick={() => handleEdit(gig)}
+                          >
+                            <Edit className="w-3.5 h-3.5" />
+                          </Button>
+                          <Button variant="outline" size="sm" className="h-8 px-2">
+                            <Eye className="w-3.5 h-3.5" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-8 px-2 text-red-600 hover:text-red-700 hover:bg-red-50"
+                            onClick={() => setDeletingGigId(gig.id)}
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </Button>
+                        </div>
                       </div>
-                    </div>
+                    )}
                   </CardContent>
                 </Card>
               ))}
@@ -178,8 +218,9 @@ export default function DigitalGigsPage() {
 
       <CreateGigModal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={handleModalClose}
         onSuccess={() => loadGigs()}
+        editGig={editingGig}
       />
     </div>
   )

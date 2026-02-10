@@ -30,6 +30,7 @@ const customerLinks: SidebarLink[] = [
 
 const technicianLinks: SidebarLink[] = [
   { name: "Dashboard", href: "/dashboard/technician", icon: LayoutDashboard },
+  { name: "My Services", href: "/dashboard/technician/services", icon: Briefcase },
   { name: "Job Requests", href: "/dashboard/technician/requests", icon: Calendar },
   { name: "Active Jobs", href: "/dashboard/technician/jobs", icon: CheckSquare },
   { name: "Messages", href: "/dashboard/technician/messages", icon: MessageSquare },
