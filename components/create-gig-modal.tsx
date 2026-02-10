@@ -156,13 +156,13 @@ export function CreateGigModal({ isOpen, onClose, onSuccess, editGig = null }: C
             const remainingSlots = 5 - formData.images.length
             const filesToProcess = fileArray.slice(0, remainingSlots)
 
-            // Use FileReader to convert images to base64 for preview
             filesToProcess.forEach(file => {
                 const reader = new FileReader()
                 reader.onloadend = () => {
+                    const result = reader.result as string
                     setFormData(prev => ({
                         ...prev,
-                        images: [...prev.images, reader.result as string].slice(0, 5)
+                        images: [...prev.images, result].slice(0, 5)
                     }))
                 }
                 reader.readAsDataURL(file)
@@ -283,39 +283,72 @@ export function CreateGigModal({ isOpen, onClose, onSuccess, editGig = null }: C
                         <p className="text-xs text-muted-foreground">Helps customers find your gig</p>
                     </div>
 
-                    <div className="space-y-2">
-                        <Label htmlFor="images">Gig Images</Label>
-                        <div className="border-2 border-dashed rounded-lg p-4">
-                            <Input
-                                id="images"
-                                type="file"
-                                multiple
-                                accept="image/*"
-                                className="hidden"
-                                onChange={handleImageUpload}
-                            />
-                            <label htmlFor="images" className="cursor-pointer flex flex-col items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
-                                <Upload className="w-8 h-8" />
-                                <span className="text-sm">Click to upload images (max 5)</span>
-                            </label>
+                    <div className="space-y-4">
+                        <Label>Gig Images</Label>
+
+                        {/* Featured Preview */}
+                        <div className="relative aspect-video w-full rounded-lg overflow-hidden border-2 border-muted bg-muted/30 group">
+                            {formData.images.length > 0 ? (
+                                <img
+                                    src={formData.images[0]}
+                                    alt="Featured Preview"
+                                    className="w-full h-full object-cover"
+                                />
+                            ) : (
+                                <div className="absolute inset-0 flex flex-col items-center justify-center text-muted-foreground gap-2">
+                                    <div className="p-4 bg-muted rounded-full">
+                                        <Upload className="w-8 h-8" />
+                                    </div>
+                                    <p className="text-sm font-medium">Main Image Preview</p>
+                                    <p className="text-xs">Select or upload photos below</p>
+                                </div>
+                            )}
+                            {formData.images.length > 0 && (
+                                <div className="absolute bottom-3 left-3 bg-primary/90 text-white text-[10px] uppercase tracking-wider font-bold px-2 py-1 rounded shadow-sm">
+                                    Featured Image
+                                </div>
+                            )}
                         </div>
 
-                        {formData.images.length > 0 && (
-                            <div className="grid grid-cols-3 gap-2 mt-2">
-                                {formData.images.map((img, index) => (
-                                    <div key={index} className="relative group">
-                                        <img src={img} alt={`Gig ${index + 1}`} className="w-full h-20 object-cover rounded" />
-                                        <button
-                                            type="button"
-                                            onClick={() => removeImage(index)}
-                                            className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                                        >
-                                            <X className="w-3 h-3" />
-                                        </button>
-                                    </div>
-                                ))}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="border-2 border-dashed rounded-lg p-6 hover:border-primary/50 transition-colors bg-muted/20 relative">
+                                <Input
+                                    id="images"
+                                    type="file"
+                                    multiple
+                                    accept="image/*"
+                                    className="hidden"
+                                    onChange={handleImageUpload}
+                                />
+                                <label htmlFor="images" className="cursor-pointer flex flex-col items-center gap-2 text-muted-foreground hover:text-foreground">
+                                    <Upload className="w-8 h-8" />
+                                    <span className="font-semibold text-xs text-foreground">Add Photos</span>
+                                    <span className="text-[10px]">Max 5 images</span>
+                                </label>
                             </div>
-                        )}
+
+                            {formData.images.length > 0 && (
+                                <div className="grid grid-cols-3 gap-2">
+                                    {formData.images.map((img, index) => (
+                                        <div key={index} className="relative aspect-square rounded-md overflow-hidden border shadow-sm group">
+                                            <img src={img} alt={`Gig ${index + 1}`} className="w-full h-full object-cover" />
+                                            <button
+                                                type="button"
+                                                onClick={() => removeImage(index)}
+                                                className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                                            >
+                                                <X className="w-3 h-3" />
+                                            </button>
+                                            {index === 0 && (
+                                                <div className="absolute top-0 left-0 bg-primary text-[8px] text-white px-1.5 py-0.5 rounded-br font-bold">
+                                                    MAIN
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
                     </div>
 
                     <DialogFooter className="pt-4">
