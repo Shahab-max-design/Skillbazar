@@ -8,6 +8,8 @@ import { BookingModal } from "@/components/booking-modal"
 import { JobRequestModal } from "@/components/job-request-modal"
 import { technicians } from "@/lib/data"
 import { useRecentProfessionals } from "@/hooks/use-recent-professionals"
+import { useUser } from "@/hooks/use-user"
+import { AuthModal } from "@/components/auth-modal"
 import {
   Star,
   MapPin,
@@ -25,9 +27,19 @@ import { Button } from "@/components/ui/button"
 export default function TechnicianProfilePage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params)
   const [isBookingOpen, setIsBookingOpen] = useState(false)
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const { addProfessional } = useRecentProfessionals()
+  const { user } = useUser()
 
   const technician = technicians.find((t) => t.id === resolvedParams.id)
+
+  const handleBookingClick = () => {
+    if (!user) {
+      setIsAuthModalOpen(true)
+      return
+    }
+    setIsBookingOpen(true)
+  }
 
   // Track when professional is viewed
   useEffect(() => {
@@ -187,7 +199,7 @@ export default function TechnicianProfilePage({ params }: { params: Promise<{ id
               // ONSITE ACTION: Send Job Request Only
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button
-                  onClick={() => setIsBookingOpen(true)}
+                  onClick={handleBookingClick}
                   className="w-full bg-blue-600 hover:bg-blue-700 text-white py-6 text-lg font-bold shadow-lg transform hover:scale-[1.02] transition-all"
                 >
                   Send Job Request
@@ -197,7 +209,7 @@ export default function TechnicianProfilePage({ params }: { params: Promise<{ id
               // DIGITAL ACTION: Book, Call, WhatsApp
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button
-                  onClick={() => setIsBookingOpen(true)}
+                  onClick={handleBookingClick}
                   className="flex-1 bg-primary hover:bg-primary/90 py-6 text-lg"
                 >
                   Book Now
@@ -291,6 +303,11 @@ export default function TechnicianProfilePage({ params }: { params: Promise<{ id
           onClose={() => setIsBookingOpen(false)}
         />
       )}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        message="Please login or create an account to send a service request."
+      />
     </main>
   )
 }

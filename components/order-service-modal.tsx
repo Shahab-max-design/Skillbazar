@@ -299,7 +299,7 @@ export function OrderServiceModal({
                                     </Button>
                                     <Button onClick={handleNext} className="w-full sm:flex-1" disabled={loading}>
                                         {loading && <Clock className="mr-2 h-4 w-4 animate-spin" />}
-                                        {loading ? "Processing..." : `Pay PKR {toPay.toLocaleString()}`}
+                                        {loading ? "Processing..." : `Pay PKR ${toPay.toLocaleString()}`}
                                     </Button>
                                 </div>
                             )}

@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Star, MapPin, Clock } from "lucide-react"
+import { useUser } from "@/hooks/use-user"
+import { AuthModal } from "@/components/auth-modal"
 import type { Technician } from "@/lib/data"
 import { JobRequestModal } from "@/components/job-request-modal"
 
@@ -11,12 +13,15 @@ const DEFAULT_PROFESSIONAL_IMAGE = "https://images.unsplash.com/photo-1472099645
 
 interface TechnicianCardProps {
   technician: Technician
+  onOrderClick?: () => void
 }
 
-export function TechnicianCard({ technician }: TechnicianCardProps) {
+export function TechnicianCard({ technician, onOrderClick }: TechnicianCardProps) {
   const [imgSrc, setImgSrc] = useState(technician.image || DEFAULT_PROFESSIONAL_IMAGE)
   const [requestSent, setRequestSent] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
+  const { user } = useUser()
 
   // Update imgSrc if technician object changes
   useEffect(() => {
@@ -24,7 +29,16 @@ export function TechnicianCard({ technician }: TechnicianCardProps) {
   }, [technician.image])
 
   const handleOpenModal = () => {
-    setIsModalOpen(true)
+    if (!user) {
+      setIsAuthModalOpen(true)
+      return
+    }
+
+    if (onOrderClick) {
+      onOrderClick()
+    } else {
+      setIsModalOpen(true)
+    }
   }
 
   const handleCloseModal = () => {
@@ -147,6 +161,12 @@ export function TechnicianCard({ technician }: TechnicianCardProps) {
         isOpen={isModalOpen}
         onClose={handleCloseModal}
         onSuccess={handleRequestSuccess}
+      />
+
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        message="Please login or create an account to send a service request."
       />
     </div>
   )

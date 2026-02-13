@@ -11,8 +11,12 @@ import { technicians, karachiAreas, services } from "@/lib/data"
 import { Search, MapPin, Filter, ChevronDown, X, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
+import { AuthModal } from "@/components/auth-modal"
+import { useUser } from "@/hooks/use-user"
+
 function TechniciansContent() {
   const searchParams = useSearchParams()
+  const { user } = useUser()
 
   // Support both old and new parameter names
   const skillParam = searchParams.get("skill") || ""
@@ -31,6 +35,7 @@ function TechniciansContent() {
 
   // Modal State
   const [isOrderModalOpen, setIsOrderModalOpen] = useState(false)
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [selectedProvider, setSelectedProvider] = useState<any>(null)
 
   useEffect(() => {
@@ -82,6 +87,10 @@ function TechniciansContent() {
   }
 
   const handleOrderClick = (technician: any) => {
+    if (!user) {
+      setIsAuthModalOpen(true)
+      return
+    }
     setSelectedProvider(technician)
     setIsOrderModalOpen(true)
   }
@@ -319,7 +328,7 @@ function TechniciansContent() {
                     />
                   </div>
                 ) : (
-                  <TechnicianCard technician={technician} />
+                  <TechnicianCard technician={technician} onOrderClick={() => handleOrderClick(technician)} />
                 )}
               </div>
             ))}
@@ -351,6 +360,12 @@ function TechniciansContent() {
           providerImage={selectedProvider.image}
         />
       )}
+
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        message="Please login or create an account to send a service request."
+      />
     </main>
   )
 }
