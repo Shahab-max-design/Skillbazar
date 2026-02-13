@@ -1,0 +1,36 @@
+{
+    "name": "SkillBazar - Expert Technician Services",
+    "short_name": "SkillBazar",
+    "description": "Find and book verified technicians in Karachi for plumbing, electrical work, AC repair, and more.",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#0f3fbf",
+    "theme_color": "#0f3fbf",
+    "icons": [
+        {
+            "src": "/icons/icon-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/icons/icon-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        },
+        {
+            "src": "/icons/icon-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        }
+    ],
+    "screenshots": [
+        {
+            "src": "/icons/splash.png",
+            "sizes": "1242x2688",
+            "type": "image/png",
+            "form_factor": "narrow",
+            "label": "SkillBazar Splash Screen"
+        }
+    ]
+}
