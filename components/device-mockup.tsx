@@ -6,7 +6,7 @@ import { Search, MapPin, User, Bell } from "lucide-react"
 
 export const DeviceMockup: React.FC = () => {
     return (
-        <div className="relative w-[300px] h-[600px] bg-gray-900 rounded-[3rem] border-[8px] border-gray-800 shadow-2xl overflow-hidden group">
+        <div className="relative w-full max-w-[300px] aspect-[1/2] bg-gray-900 rounded-[3rem] border-[8px] border-gray-800 shadow-2xl overflow-hidden group mx-auto">
             {/* Device Inner Border / Screen Glow */}
             <div className="absolute inset-x-0 inset-y-0 rounded-[2.5rem] border border-white/10 pointer-events-none z-30"></div>
 

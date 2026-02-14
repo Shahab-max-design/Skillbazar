@@ -24,12 +24,16 @@ export const ProfessionalHero: React.FC = () => {
 
     // GSAP Animations
     useEffect(() => {
-        // Floating Animation
+        // Floating Animation - Responsive offsets
+        const isMobile = window.innerWidth < 1024
+        const floatDistance = isMobile ? 12 : 30
+        const floatDuration = isMobile ? 2.5 : 3
+
         gsap.to(mockupRef.current, {
-            y: "-=30",
-            x: "+=10",
-            rotationZ: "+=2",
-            duration: 3,
+            y: `-=${floatDistance}`,
+            x: `+=${isMobile ? 5 : 10}`,
+            rotationZ: `+=${isMobile ? 1 : 2}`,
+            duration: floatDuration,
             repeat: -1,
             yoyo: true,
             ease: "sine.inOut"
@@ -111,7 +115,7 @@ export const ProfessionalHero: React.FC = () => {
                 <div className="flex flex-col space-y-6 md:space-y-8 w-full">
                     <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold text-white leading-[1.1] tracking-tight">
                         The Smarter Way <br className="hidden sm:block" />
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-blue-400 to-purple-500">
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-400">
                             to Hire Professionals
                         </span>
                     </h1>
@@ -199,7 +203,7 @@ export const ProfessionalHero: React.FC = () => {
                             <div className="flex items-end">
                                 <Button
                                     onClick={handleSearch}
-                                    className="w-full bg-primary hover:bg-primary/90 text-white rounded-xl py-6 text-base font-bold shadow-[0_0_20px_rgba(139,92,246,0.3)]"
+                                    className="w-full bg-primary hover:bg-primary/90 text-white rounded-xl py-6 text-base font-bold shadow-[0_0_20px_rgba(139,92,246,0.3)] transition-all duration-300 hover:scale-105 hover:shadow-[0_0_30px_rgba(139,92,246,0.6)] animate-neon-glow ring-2 ring-primary/20 ring-offset-2 ring-offset-[#050505] hover:ring-primary/50"
                                 >
                                     <Search className="w-5 h-5 mr-2" />
                                     Find Pro
@@ -212,10 +216,10 @@ export const ProfessionalHero: React.FC = () => {
                 </div>
 
                 {/* Right Column: Device Mockup - Hidden/Small on Mobile */}
-                <div className="flex items-center justify-center lg:justify-end perspective-[2000px] w-full pt-10 lg:pt-0">
+                <div className="flex flex-col items-center justify-center pt-4 px-4 lg:pt-12 lg:px-6 perspective-[2000px] w-full lg:justify-center overflow-hidden">
                     <div
                         ref={mockupRef}
-                        className="relative preserve-3d scale-75 sm:scale-90 lg:scale-100"
+                        className="relative preserve-3d scale-75 sm:scale-90 lg:scale-100 max-w-full sm:max-w-[400px] lg:max-w-[800px] mx-auto"
                     >
                         {/* Soft Glow behind device */}
                         <div className="absolute -inset-10 bg-primary/20 rounded-[4rem] blur-[60px] opacity-50"></div>
@@ -223,7 +227,7 @@ export const ProfessionalHero: React.FC = () => {
                         <DeviceMockup />
 
                         {/* Floating Badges - Hidden on super small screens */}
-                        <div className="hidden sm:block absolute -left-12 top-1/4 bg-white/10 backdrop-blur-xl border border-white/20 p-4 rounded-2xl shadow-2xl animate-bounce-slow">
+                        <div className="hidden sm:block absolute left-0 lg:-left-12 top-1/4 bg-white/10 backdrop-blur-xl border border-white/20 p-4 rounded-2xl shadow-2xl animate-bounce-slow z-50">
                             <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
                                     <Shield className="w-5 h-5 text-primary" />
@@ -235,7 +239,7 @@ export const ProfessionalHero: React.FC = () => {
                             </div>
                         </div>
 
-                        <div className="hidden sm:block absolute -right-8 bottom-1/4 bg-white/10 backdrop-blur-xl border border-white/20 p-4 rounded-2xl shadow-2xl animate-bounce-slow animation-delay-1000">
+                        <div className="hidden sm:block absolute right-0 lg:-right-8 bottom-1/4 bg-white/10 backdrop-blur-xl border border-white/20 p-4 rounded-2xl shadow-2xl animate-bounce-slow animation-delay-1000 z-50">
                             <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 rounded-full bg-yellow-500/20 flex items-center justify-center">
                                     <Star className="w-5 h-5 text-yellow-500" />
