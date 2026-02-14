@@ -1,7 +1,7 @@
 "use client"
 
 import { Navbar } from "@/components/navbar"
-import { HeroSection } from "@/components/hero-section"
+import { ProfessionalHero } from "@/components/professional-hero"
 import { HowItWorks } from "@/components/how-it-works"
 import { ServicesSection } from "@/components/services-section"
 import { TestimonialsSection } from "@/components/testimonials-section"
@@ -12,9 +12,9 @@ import { FindServicesSlider } from "@/components/find-services-slider"
 export default function HomePage() {
 
   return (
-    <main className="min-h-screen">
+    <main className="relative min-h-screen overflow-visible">
       <Navbar />
-      <HeroSection />
+      <ProfessionalHero />
       <FindServicesSlider />
       <HowItWorks />
       <ServicesSection />

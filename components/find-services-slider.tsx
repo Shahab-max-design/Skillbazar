@@ -283,7 +283,7 @@ export function FindServicesSlider() {
 
     return (
         <section
-            className="py-24 bg-slate-50 overflow-hidden"
+            className="relative z-10 py-24 bg-slate-50 overflow-hidden"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
         >
