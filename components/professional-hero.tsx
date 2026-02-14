@@ -208,20 +208,7 @@ export const ProfessionalHero: React.FC = () => {
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 pt-8 border-t border-white/5 w-full">
-                        <div className="flex flex-col items-center sm:items-start">
-                            <div className="text-3xl font-bold text-white">50k+</div>
-                            <div className="text-sm text-gray-500">Successful Gigs</div>
-                        </div>
-                        <div className="flex flex-col items-center sm:items-start">
-                            <div className="text-3xl font-bold text-white">4.9/5</div>
-                            <div className="text-sm text-gray-500">Client Rating</div>
-                        </div>
-                        <div className="flex flex-col items-center sm:items-start">
-                            <div className="text-3xl font-bold text-white">24/7</div>
-                            <div className="text-sm text-gray-500">Live Support</div>
-                        </div>
-                    </div>
+                    {/* The stats section previously here has been moved to its own component */}
                 </div>
 
                 {/* Right Column: Device Mockup - Hidden/Small on Mobile */}
