@@ -26,9 +26,9 @@ export default function RootLayout({
     <html lang="en">
 
       <body className={`font-sans antialiased`}>
-
-        {children}
-
+        <div className="relative w-full overflow-x-hidden">
+          {children}
+        </div>
         <Analytics />
       </body>
     </html>

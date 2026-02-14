@@ -96,19 +96,19 @@ export const ProfessionalHero: React.FC = () => {
     return (
         <section
             ref={heroRef}
-            className="relative z-[100] min-h-screen w-full flex flex-col items-center justify-center overflow-visible bg-[#050505] pt-28 pb-20"
+            className="relative z-[100] min-h-screen w-full flex flex-col items-center justify-center overflow-hidden bg-[#050505] pt-28 pb-20"
         >
             {/* Background Abstract Shapes */}
-            <div ref={shapesRef} className="absolute inset-0 pointer-events-none z-0 overflow-visible">
+            <div ref={shapesRef} className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
                 <div className="absolute top-[10%] left-[15%] w-64 md:w-96 h-64 md:h-96 bg-primary/20 rounded-full blur-[80px] md:blur-[120px]"></div>
                 <div className="absolute bottom-[20%] right-[20%] w-80 md:w-[500px] h-80 md:h-[500px] bg-blue-600/10 rounded-full blur-[100px] md:blur-[150px]"></div>
                 <div className="absolute top-[40%] right-[10%] w-48 md:w-64 h-48 md:h-64 bg-purple-600/15 rounded-full blur-[70px] md:blur-[100px]"></div>
             </div>
 
-            <div className="relative z-[110] max-w-7xl mx-auto px-4 sm:px-6 w-full flex flex-col lg:grid lg:grid-cols-2 gap-12 items-center overflow-visible">
+            <div className="relative z-[110] max-w-7xl mx-auto px-4 sm:px-6 w-full flex flex-col lg:grid lg:grid-cols-2 gap-12 items-center">
 
                 {/* Left Column: Content */}
-                <div className="flex flex-col space-y-6 md:space-y-8 w-full overflow-visible">
+                <div className="flex flex-col space-y-6 md:space-y-8 w-full">
                     <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold text-white leading-[1.1] tracking-tight">
                         The Smarter Way <br className="hidden sm:block" />
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-blue-400 to-purple-500">

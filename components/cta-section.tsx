@@ -19,7 +19,7 @@ export function CTASection() {
   }
 
   return (
-    <section className="py-20 bg-primary">
+    <section className="py-20 bg-primary overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid md:grid-cols-2 gap-12 items-center">
           {/* For Customers */}
@@ -28,8 +28,8 @@ export function CTASection() {
             <p className="text-lg text-primary-foreground/80 mb-6">
               Find trusted technicians in your area and get your problems solved today.
             </p>
-            <Button 
-              size="lg" 
+            <Button
+              size="lg"
               className="bg-white text-primary hover:bg-gray-100 cursor-pointer focus:outline-none focus:ring-2 focus:ring-white/50"
               onClick={handleFindTechnician}
             >

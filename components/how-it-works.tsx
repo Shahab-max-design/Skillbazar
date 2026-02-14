@@ -54,7 +54,7 @@ export function HowItWorks() {
   }, [])
 
   return (
-    <section ref={sectionRef} className="py-20 bg-muted">
+    <section ref={sectionRef} className="py-20 bg-muted overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">How It Works</h2>
@@ -70,9 +70,9 @@ export function HowItWorks() {
               className={`relative transition-all duration-500 ${visibleSteps.includes(index) ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
                 }`}
             >
-              {/* Connector Line */}
+              {/* Connector Line - Only for first 3 steps on large screens */}
               {index < steps.length - 1 && (
-                <div className="hidden lg:block absolute top-12 left-1/2 w-full h-0.5 bg-border" />
+                <div className="hidden lg:block absolute top-12 left-[60%] w-[80%] h-0.5 bg-border pointer-events-none z-0" />
               )}
 
               <div className="relative bg-card rounded-2xl p-6 shadow-sm hover:shadow-lg transition-shadow text-center">
