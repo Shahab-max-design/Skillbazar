@@ -109,11 +109,6 @@ export const ProfessionalHero: React.FC = () => {
 
                 {/* Left Column: Content */}
                 <div className="flex flex-col space-y-6 md:space-y-8 w-full overflow-visible">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-white/80 text-sm font-medium w-fit backdrop-blur-md">
-                        <span className="flex h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
-                        SkillBazar v2.0 is live
-                    </div>
-
                     <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold text-white leading-[1.1] tracking-tight">
                         The Smarter Way <br className="hidden sm:block" />
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-blue-400 to-purple-500">

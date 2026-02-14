@@ -6,6 +6,7 @@ import { DashboardSidebar } from "@/components/dashboard-sidebar"
 import { DashboardHeader } from "@/components/dashboard-header"
 import { QuickCategories } from "@/components/quick-categories"
 import { RecentProfessionalsSection } from "@/components/recent-professionals-section"
+import { CustomerCompletedServices } from "@/components/customer-completed-services"
 import { SupportSection } from "@/components/support-section"
 import { useUser } from "@/hooks/use-user"
 
@@ -60,6 +61,11 @@ export default function CustomerDashboardPage() {
             {/* Recent Professionals Section */}
             <section>
               <RecentProfessionalsSection />
+            </section>
+
+            {/* Completed Services Section - NEW */}
+            <section className="pt-8">
+              <CustomerCompletedServices />
             </section>
 
             {/* Support Section */}
