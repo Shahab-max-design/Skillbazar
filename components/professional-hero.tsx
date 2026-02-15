@@ -126,7 +126,7 @@ export const ProfessionalHero: React.FC = () => {
 
                     {/* Integrated Search Box - Full Width on Mobile */}
                     <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 sm:p-6 border border-white/10 relative z-[200] w-full shadow-2xl overflow-visible">
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 overflow-visible">
+                        <div className="grid grid-cols-1 sm:grid-cols-[1fr_1fr_auto] gap-4 overflow-visible">
                             {/* Area Dropdown */}
                             <div className="relative" ref={areaRef}>
                                 <label className="block text-xs uppercase tracking-wider text-gray-400 mb-2 font-semibold">Select Area</label>
@@ -200,13 +200,13 @@ export const ProfessionalHero: React.FC = () => {
                             </div>
 
                             {/* Search Button */}
-                            <div className="flex items-end">
+                            <div className="flex items-end sm:min-w-[200px]">
                                 <Button
                                     onClick={handleSearch}
-                                    className="relative bg-gradient-to-r from-green-500 to-green-600 text-white font-bold px-8 py-4 rounded-2xl shadow-lg transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-[0_0_25px_rgba(34,197,94,0.8)] active:scale-95 before:absolute before:inset-0 before:rounded-2xl before:bg-green-400 before:blur-xl before:opacity-50 before:transition before:duration-500 before:ease-in-out hover:before:opacity-80 flashy-green h-auto"
+                                    className="w-full h-auto py-4 px-6 bg-gradient-to-r from-green-500 to-green-600 text-white font-bold rounded-2xl shadow-[0_0_15px_rgba(34,197,94,0.4)] transition-all duration-300 neon-glow-button whitespace-nowrap flex items-center justify-center gap-2 flashy-green border-none"
                                 >
-                                    <Search className="w-5 h-5 mr-2" />
-                                    Find Pro
+                                    <Search className="w-5 h-5" />
+                                    <span>Find Professional</span>
                                 </Button>
                             </div>
                         </div>

@@ -299,3 +299,22 @@
 .flashy-green {
   animation: pulseGreen 2s infinite ease-in-out;
 }
+
+/* Neon Green Glowing Effect for Find Professional Button */
+.neon-glow-button {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.neon-glow-button:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 0 15px rgba(34, 197, 94, 0.6),
+    0 0 30px rgba(34, 197, 94, 0.4),
+    0 0 45px rgba(34, 197, 94, 0.2);
+  filter: brightness(1.1);
+}
+
+.neon-glow-button:active {
+  transform: translateY(0) scale(0.98);
+}
