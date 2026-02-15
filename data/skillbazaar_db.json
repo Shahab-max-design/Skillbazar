@@ -1,0 +1,68 @@
+{
+  "technicianRequests": [
+    {
+      "id": "req-1771125624556",
+      "customerId": "shahabrajper@gmail.com",
+      "technicianId": "el-3",
+      "technicianName": "Faisal Ahmed",
+      "technicianImage": "https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=400&h=400&fit=crop&crop=face",
+      "serviceRequired": "Electrician",
+      "problemDescription": "kk",
+      "address": "Saeedabad Baldia Town",
+      "preferredDate": "2026-02-17",
+      "budget": "8888",
+      "status": "pending",
+      "imageName": "HOUSE.jpeg",
+      "imageSize": 11189,
+      "createdAt": "2026-02-15T03:20:24.556Z"
+    },
+    {
+      "id": "req-1771126418529",
+      "customerId": "test@example.com",
+      "technicianId": "test",
+      "technicianName": null,
+      "technicianImage": null,
+      "serviceRequired": "test",
+      "problemDescription": "test",
+      "address": "test",
+      "preferredDate": "2026-02-15",
+      "budget": null,
+      "status": "pending",
+      "imageName": null,
+      "imageSize": null,
+      "createdAt": "2026-02-15T03:33:38.529Z"
+    },
+    {
+      "id": "req-1771126673375",
+      "customer_id": "shahabrajper@gmail.com",
+      "technician_id": "1",
+      "technician_name": "Ahmed Khan",
+      "technician_image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face",
+      "service_required": "Electrician",
+      "description": "uuuuu",
+      "address": "Saeedabad Baldia Town",
+      "preferred_date": "2026-02-20",
+      "budget": "9888",
+      "status": "pending",
+      "image_name": null,
+      "image_size": null,
+      "created_at": "2026-02-15T03:37:53.375Z"
+    }
+  ],
+  "freelancerOrders": [
+    {
+      "id": "order-1771126714280",
+      "customer_id": "shahabrajper@gmail.com",
+      "provider_id": "d-3",
+      "provider_name": "Ahmed Malik",
+      "provider_image": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face",
+      "service_title": "UI/UX Designer",
+      "description": "hhhhhh",
+      "delivery_time": "2026-02-16",
+      "payment_status": "full",
+      "amount": 2500,
+      "status": "pending",
+      "created_at": "2026-02-15T03:38:34.280Z"
+    }
+  ]
+}

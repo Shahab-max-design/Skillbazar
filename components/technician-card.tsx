@@ -6,7 +6,7 @@ import { Star, MapPin, Clock } from "lucide-react"
 import { useUser } from "@/hooks/use-user"
 import { AuthModal } from "@/components/auth-modal"
 import type { Technician } from "@/lib/data"
-import { JobRequestModal } from "@/components/job-request-modal"
+import { ServiceRequestModal } from "@/components/service-request-modal"
 
 // Default professional male profile image as fallback
 const DEFAULT_PROFESSIONAL_IMAGE = "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face"
@@ -34,7 +34,12 @@ export function TechnicianCard({ technician, onOrderClick }: TechnicianCardProps
       return
     }
 
-    if (onOrderClick) {
+    // Role check: Only customers can send requests
+    if (user.role !== "customer") {
+      return
+    }
+
+    if (onOrderClick && technician.type === "digital") {
       onOrderClick()
     } else {
       setIsModalOpen(true)
@@ -135,19 +140,19 @@ export function TechnicianCard({ technician, onOrderClick }: TechnicianCardProps
             <span>{technician.completedJobs} jobs completed</span>
           </div>
 
-          {/* Action Button - ONSITE ONLY */}
-          {technician.type === "onsite" && (
+          {/* Action Button - ONSITE ONLY & ONLY FOR CUSTOMERS */}
+          {technician.type === "onsite" && user?.role === "customer" && (
             <div className="mt-auto pt-2">
               {requestSent ? (
                 <div className="w-full bg-green-50 border border-green-200 text-green-700 py-3 px-4 rounded-lg text-sm font-medium text-center">
-                  ✅ Your request has been sent. Please wait for approval.
+                  Request Sent ✅
                 </div>
               ) : (
                 <button
                   onClick={handleOpenModal}
                   className="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg font-medium transition-all duration-200 active:scale-[0.98] shadow-sm hover:shadow-md"
                 >
-                  Send Job Request
+                  Send Request
                 </button>
               )}
             </div>
@@ -155,8 +160,8 @@ export function TechnicianCard({ technician, onOrderClick }: TechnicianCardProps
         </div>
       </div>
 
-      {/* Job Request Modal */}
-      <JobRequestModal
+      {/* Service Request Modal */}
+      <ServiceRequestModal
         technician={technician}
         isOpen={isModalOpen}
         onClose={handleCloseModal}

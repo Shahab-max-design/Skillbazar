@@ -31,30 +31,41 @@ export function CustomerRequestList() {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [isRefreshing, setIsRefreshing] = useState(false)
 
-    const loadRequests = () => {
+    const loadRequests = async () => {
+        if (!user?.email) return
+
         setIsRefreshing(true)
-        const stored = localStorage.getItem("technicianRequests")
-        if (stored) {
-            try {
-                const allRequests: Request[] = JSON.parse(stored)
-                // Filter for current user and onsite type
-                // Note: user.id might be numeric or string depending on implementation, 
-                // but checking the file `hooks/use-user.ts` (not shown here) would verify.
-                // Assuming it matches the logic we put in `job-request-modal`
-                const userId = user?.id
+        try {
+            const response = await fetch("/api/my-requests", {
+                headers: {
+                    "Authorization": `Bearer ${user.email}`
+                }
+            })
+            const result = await response.json()
 
-                const myRequests = allRequests.filter(
-                    r => (r.serviceType === "onsite") &&
-                        // If request has customerId, match it. If not, filtered only by onsite (legacy/demo support)
-                        (!r.customerId || (userId && String(r.customerId) === String(userId)) || !userId)
-                ).reverse() // Newest first
+            console.log("API Response:", result)
 
-                setRequests(myRequests)
-            } catch (e) {
-                console.error("Failed to parse requests", e)
+            if (result.success) {
+                // The API returns two arrays, we use technicianRequests for this component
+                const technicianRequests = (result.technicianRequests || []).map((r: any) => ({
+                    ...r,
+                    technicianName: r.technician_name || r.technicianName || "Technician",
+                    technicianImage: r.technician_image || r.technicianImage,
+                    service: r.service_required || r.serviceRequired,
+                    title: r.service_required || r.serviceRequired,
+                    description: r.description || r.problemDescription,
+                    date: r.preferred_date || r.preferredDate,
+                    time: "N/A",
+                    location: r.address,
+                    serviceType: "onsite" as const
+                }))
+                setRequests(technicianRequests.reverse())
             }
+        } catch (e) {
+            console.error("Failed to fetch requests from API", e)
+        } finally {
+            setIsRefreshing(false)
         }
-        setIsRefreshing(false)
     }
 
     useEffect(() => {

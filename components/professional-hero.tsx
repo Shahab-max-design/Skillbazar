@@ -203,7 +203,7 @@ export const ProfessionalHero: React.FC = () => {
                             <div className="flex items-end">
                                 <Button
                                     onClick={handleSearch}
-                                    className="w-full bg-primary hover:bg-primary/90 text-white rounded-xl py-6 text-base font-bold shadow-[0_0_20px_rgba(139,92,246,0.3)] transition-all duration-300 hover:scale-105 hover:shadow-[0_0_30px_rgba(139,92,246,0.6)] animate-neon-glow ring-2 ring-primary/20 ring-offset-2 ring-offset-[#050505] hover:ring-primary/50"
+                                    className="relative bg-gradient-to-r from-green-500 to-green-600 text-white font-bold px-8 py-4 rounded-2xl shadow-lg transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-[0_0_25px_rgba(34,197,94,0.8)] active:scale-95 before:absolute before:inset-0 before:rounded-2xl before:bg-green-400 before:blur-xl before:opacity-50 before:transition before:duration-500 before:ease-in-out hover:before:opacity-80 flashy-green h-auto"
                                 >
                                     <Search className="w-5 h-5 mr-2" />
                                     Find Pro

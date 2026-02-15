@@ -29,24 +29,39 @@ export function CustomerDigitalOrdersList() {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [isRefreshing, setIsRefreshing] = useState(false)
 
-    const loadOrders = () => {
+    const loadOrders = async () => {
+        if (!user?.email) return
+
         setIsRefreshing(true)
-        const stored = localStorage.getItem("digitalOrders")
-        if (stored) {
-            try {
-                const allOrders: DigitalOrder[] = JSON.parse(stored)
-                const userId = user?.id
+        try {
+            const response = await fetch("/api/my-requests", {
+                headers: {
+                    "Authorization": `Bearer ${user.email}`
+                }
+            })
+            const result = await response.json()
 
-                const myOrders = allOrders.filter(
-                    o => (!o.customerId || (userId && String(o.customerId) === String(userId)) || !userId)
-                ).reverse() // Newest first
+            console.log("API Response:", result)
 
-                setOrders(myOrders)
-            } catch (e) {
-                console.error("Failed to parse digital orders", e)
+            if (result.success) {
+                // The API returns two arrays, we use freelancerOrders for this component
+                const freelancerOrders = (result.freelancerOrders || []).map((o: any) => ({
+                    ...o,
+                    providerName: o.provider_name || o.providerName || "Provider",
+                    providerImage: o.provider_image || o.providerImage || "/placeholder.png",
+                    serviceTitle: o.service_title || o.serviceTitle,
+                    description: o.description,
+                    deliveryTime: o.delivery_time || o.deliveryTime || "3-5 Days",
+                    paymentStatus: o.payment_status || o.paymentStatus || "full",
+                    createdAt: o.created_at || o.createdAt || new Date().toISOString()
+                }))
+                setOrders(freelancerOrders.reverse())
             }
+        } catch (e) {
+            console.error("Failed to fetch digital orders from API", e)
+        } finally {
+            setIsRefreshing(false)
         }
-        setIsRefreshing(false)
     }
 
     useEffect(() => {

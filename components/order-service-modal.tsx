@@ -16,6 +16,8 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Badge } from "@/components/ui/badge"
+import { useUser } from "@/hooks/use-user"
+import { format } from "date-fns"
 
 interface OrderServiceModalProps {
     isOpen: boolean
@@ -36,8 +38,9 @@ export function OrderServiceModal({
     providerName,
     startingPrice,
     providerId = "unknown",
-    providerImage = "/placeholder.svg",
+    providerImage = "/placeholder.png",
 }: OrderServiceModalProps) {
+    const { user } = useUser()
     const [step, setStep] = useState<OrderStep>("details")
     const [loading, setLoading] = useState(false)
     const [formData, setFormData] = useState({
@@ -74,39 +77,50 @@ export function OrderServiceModal({
         }
     }
 
-    const processOrder = () => {
+    const processOrder = async () => {
         setLoading(true)
+        console.log("Processing order for:", serviceTitle)
 
-        // Create the digital order object
-        const newOrder = {
-            id: `order-${Date.now()}`,
-            customerId: "guest", // Will be updated when user system is integrated
-            providerId: providerId,
-            providerName: providerName,
-            providerImage: providerImage,
-            serviceTitle: serviceTitle,
-            description: formData.projectDetails,
-            deliveryTime: formData.deadline || "3-5 Days",
-            paymentStatus: formData.paymentOption === "full" ? "full" : "partial",
-            status: "pending",
-            amount: calculateTotal(),
-            createdAt: new Date().toISOString(),
-        }
+        try {
+            const data = new FormData()
+            data.append("provider_id", providerId)
+            data.append("provider_name", providerName)
+            data.append("provider_image", providerImage)
+            data.append("service_title", serviceTitle)
+            data.append("description", formData.projectDetails)
+            data.append("delivery_time", formData.deadline || "3-5 Days")
+            data.append("payment_status", formData.paymentOption)
+            data.append("amount", calculateTotal().toString())
 
-        // Save to localStorage
-        const stored = localStorage.getItem("digitalOrders")
-        const orders = stored ? JSON.parse(stored) : []
-        orders.push(newOrder)
-        localStorage.setItem("digitalOrders", JSON.stringify(orders))
+            // Add first file if exists (for now, simpler demo)
+            if (formData.files && formData.files.length > 0) {
+                data.append("image", formData.files[0])
+            }
 
-        // Dispatch event to update dashboard
-        window.dispatchEvent(new Event("new-digital-order"))
+            console.log("Calling API with data:", Object.fromEntries(data.entries()))
+            const response = await fetch("/api/freelancer-order", {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${user?.email || "anonymous"}`
+                },
+                body: data,
+            })
 
-        // Simulate API call
-        setTimeout(() => {
+            const result = await response.json()
+            console.log("Response:", result)
+
+            if (result.success) {
+                // Dispatch event to update dashboard (local state sync)
+                window.dispatchEvent(new Event("new-digital-order"))
+                setStep("success")
+            } else {
+                console.error("Order failed:", result.message)
+            }
+        } catch (error) {
+            console.error("Error processing order:", error)
+        } finally {
             setLoading(false)
-            setStep("success")
-        }, 1500)
+        }
     }
 
     const calculateTotal = () => {
